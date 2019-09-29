@@ -16,6 +16,8 @@
 <script>
 import Field from '../components/Field.vue';
 
+import io from "../../io.js";
+
 export default {
 	components: { Field },
 	data: () => {
@@ -110,13 +112,20 @@ export default {
 					]
 				}
 			],
+			accounts: []
 		}
 	},
 	methods: {
 		
 	},
 	mounted() {
-		
+		io.getSocket(socket => {
+			this.socket = socket;
+
+			socket.emit("getAccounts", res => {
+				this.accounts = res.accounts;
+			});
+		});
 	}
 };
 </script>

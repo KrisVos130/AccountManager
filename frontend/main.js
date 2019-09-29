@@ -4,6 +4,8 @@ import VueRouter from "vue-router";
 
 import App from "./vue/App.vue";
 
+import io from "./io.js";
+
 Vue.use(VueRouter);
 
 const router = new VueRouter({
@@ -15,6 +17,8 @@ const router = new VueRouter({
 		}
 	]
 });
+
+io.init("http://localhost:8080");
 
 new Vue({
 	router,
