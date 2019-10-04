@@ -11,6 +11,8 @@ const express = require("express");
 const http = require("http");
 const socketio = require('socket.io');
 
+const accountSchema = require("../schemas/account.js");
+
 module.exports = class extends coreClass {
 	/*constructor(name, moduleManager) {
 		super(name, moduleManager);
@@ -30,6 +32,12 @@ module.exports = class extends coreClass {
 				"getAccounts": cb => {
 					cb({
 						accounts: []
+					});
+				},
+
+				"getAccountSchema": cb => {
+					cb({
+						schema: accountSchema
 					});
 				}
 			}

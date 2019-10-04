@@ -1,6 +1,6 @@
 <template>
 	<div class="control">
-		<label for="name">{{ name }} (min: {{minEntries}}, max: {{maxEntries}})</label>
+		<label for="name">{{ name }}</label>
 		<button v-if="entries.length === 0" @click="addEntry()" type="button">+</button>
 		<div class="control-row" v-for="(entry, entryIndex) in entries">
 			<div class="control-col" v-for="(fieldType, fieldIndex) in fieldTypes" :class="{ 'fill-remaining': fieldType.fill }">
@@ -26,7 +26,7 @@ function Field() {
 export default {
 	data: function() {
 		return {
-			entries: this.initialEntries
+			entries: [this.initialEntries]
 		};
 	},
 	methods: {

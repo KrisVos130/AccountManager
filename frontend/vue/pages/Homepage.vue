@@ -3,11 +3,11 @@
 		<h1>Sites</h1>
 		<form>
 			<field
-				v-for="field in exampleFields"
+				v-for="field in fields"
 				:name="field.name"
 				:minEntries="field.minEntries"
 				:maxEntries="field.maxEntries"
-				:initialEntries="field.initialEntries"
+				:initialEntries="[]"
 				:fieldTypes="field.fieldTypes"/>
 		</form>
 	</div>
@@ -22,96 +22,7 @@ export default {
 	components: { Field },
 	data: () => {
 		return {
-			exampleFields: [
-				{
-					name: "Domain",
-					fieldTypes: [
-						{
-							type: "checkbox",
-							extraButtons: []
-						},
-						{
-							type: "select",
-							options: [
-								{
-									value: "option1",
-									text: "Option 1"
-								},
-								{
-									value: "option2",
-									text: "Option 2"
-								},
-								{
-									value: "option3",
-									text: "Option 3"
-								}
-							]/*,
-							extraButtons: [
-								{
-									icon: "~",
-									style: "red"
-								}
-							]*/
-						},
-						{
-							type: "text",
-							extraButtons: [],
-							fill: true
-						}
-					],
-					minEntries: 0,
-					maxEntries: 3,
-					initialEntries: [
-						[
-							true,
-							"option1",
-							"Hahaha value"
-						]
-					]
-				},
-				{
-					name: "Apps",
-					fieldTypes: [
-						{
-							type: "select",
-							options: [
-								{
-									value: "option1",
-									text: "Option 1"
-								},
-								{
-									value: "option2",
-									text: "Option 2"
-								},
-								{
-									value: "option3",
-									text: "Option 3"
-								}
-							]/*,
-							extraButtons: [
-								{
-									icon: "~",
-									style: "red"
-								}
-							]*/
-						},
-						{
-							type: "text",
-							extraButtons: [],
-							fill: true
-						}
-					],
-					minEntries: 0,
-					maxEntries: 3,
-					initialEntries: [
-						[
-							true,
-							"option1",
-							"Hahaha value"
-						]
-					]
-				}
-			],
+			fields: [],
 			accounts: []
 		}
 	},
@@ -121,6 +32,10 @@ export default {
 	mounted() {
 		io.getSocket(socket => {
 			this.socket = socket;
+
+			socket.emit("getAccountSchema", res => {
+				this.fields = res.schema.versions[0].fields;
+			});
 
 			socket.emit("getAccounts", res => {
 				this.accounts = res.accounts;
