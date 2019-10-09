@@ -11,14 +11,12 @@ const express = require("express");
 const http = require("http");
 const socketio = require('socket.io');
 
-const accountSchema = require("../schemas/account.js");
-
 module.exports = class extends coreClass {
-	/*constructor(name, moduleManager) {
+	constructor(name, moduleManager) {
 		super(name, moduleManager);
 
-		//this.dependsOn = ["app", "db", "cache", "utils"];
-	}*/
+		this.dependsOn = ["mongo"];
+	}
 
 	initialize() {
 		return new Promise(resolve => {
@@ -28,6 +26,8 @@ module.exports = class extends coreClass {
 			const server = http.createServer(app);
 			const io = socketio(server);
 
+			this.mongo = this.moduleManager.modules["mongo"];
+
 			this.handlers = {
 				"getAccounts": cb => {
 					cb({
@@ -36,8 +36,32 @@ module.exports = class extends coreClass {
 				},
 
 				"getAccountSchema": cb => {
-					cb({
-						schema: accountSchema
+					this.mongo.models.accountSchema.find({}, null, { sort: ["version"], limit: 1 }, (err, res) => {
+						if (err || !res || res.length !== 1)
+							return cb({
+								status: "failure",
+								message: "Something went wrong."
+							});
+						else
+							return cb({
+								status: "success",
+								schema: res[0]
+							});
+					});
+				},
+
+				"importAccountSchema": (cb, name) => {
+					let schema = require(`../schemas/${name}`);
+					this.mongo.models.accountSchema.create(schema, (err) => {
+						if (err)
+							return cb({
+								status: "failure",
+								err: err
+							});
+						else
+							return cb({
+								status: "success"
+							});
 					});
 				}
 			}

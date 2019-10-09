@@ -1,5 +1,8 @@
 <template>
 	<div>
+		<input v-model="importAccountSchemaName"/>
+		<button @click="importAccountSchema()">Import account schema</button>
+		<hr />
 		<h1>Sites</h1>
 		<form>
 			<field
@@ -23,18 +26,25 @@ export default {
 	data: () => {
 		return {
 			fields: [],
-			accounts: []
+			accounts: [],
+			importAccountSchemaName: ""
 		}
 	},
 	methods: {
-		
+		importAccountSchema() {
+			this.socket.emit("importAccountSchema", this.importAccountSchemaName, (res) => {
+				console.log(res);
+				alert(res.status);
+			});
+		}
 	},
 	mounted() {
 		io.getSocket(socket => {
 			this.socket = socket;
 
 			socket.emit("getAccountSchema", res => {
-				this.fields = res.schema.versions[0].fields;
+				console.log(res);
+				this.fields = res.schema.fields;
 			});
 
 			socket.emit("getAccounts", res => {
