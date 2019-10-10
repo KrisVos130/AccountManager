@@ -44,6 +44,21 @@ module.exports = class extends coreClass {
 					});
 				},
 
+				"getAccount": (cb, accountId) => {
+					this.mongo.models.account.findById(accountId, (err, account) => {
+						if (err || !account)
+							return cb({
+								status: "failure",
+								err: err
+							});
+						else
+							return cb({
+								status: "success",
+								account
+							});
+					});
+				},
+
 				"addAccount": (cb, account) => {
 					this.mongo.models.account.create(account, (err) => {
 						if (err)
@@ -53,6 +68,21 @@ module.exports = class extends coreClass {
 							});
 						else
 							console.log("Added account!");
+							return cb({
+								status: "success"
+							});
+					});
+				},
+
+				"editAccount": (cb, accountId, account) => {
+					this.mongo.models.account.updateOne({ _id: accountId }, account, (err) => {
+						if (err)
+							return cb({
+								status: "failure",
+								err: err
+							});
+						else
+							console.log("Editted account!");
 							return cb({
 								status: "success"
 							});

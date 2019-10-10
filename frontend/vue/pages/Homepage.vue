@@ -33,9 +33,6 @@ export default {
 				console.log(res);
 				alert(res.status);
 			});
-		},
-		addAccount() {
-			
 		}
 	},
 	mounted() {

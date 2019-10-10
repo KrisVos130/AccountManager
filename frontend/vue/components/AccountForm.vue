@@ -25,10 +25,7 @@ export default {
 	data: function() {
 		return {
 			fields: [],
-			account: {
-				version: 1,
-				fields: {}
-			}
+			account: {}
 		};
 	},
 	methods: {
@@ -43,7 +40,8 @@ export default {
 		}
 	},
 	props: {
-		onSubmit: Function
+		onSubmit: Function,
+		initialAccount: Object
 	},
 	mounted() {
 		io.getSocket(socket => {
@@ -51,19 +49,26 @@ export default {
 
 			socket.emit("getAccountSchema", res => {
 				this.fields = res.schema.fields;
-				this.fields.forEach(field => {
-					let defaultObject = {};
-					field.fieldTypes.forEach(fieldType => {
-						if (fieldType.type === "text" || fieldType.type === "select") defaultObject[fieldType.fieldTypeId] = "";
-						else if (fieldType.type === "checkbox") defaultObject[fieldType.fieldTypeId] = false;
+				if (!this.initialAccount) {
+					this.account.fields = {};
+					this.account.version = res.schema.version;
+
+					this.fields.forEach(field => {
+						let defaultObject = {};
+						field.fieldTypes.forEach(fieldType => {
+							if (fieldType.type === "text" || fieldType.type === "select") defaultObject[fieldType.fieldTypeId] = "";
+							else if (fieldType.type === "checkbox") defaultObject[fieldType.fieldTypeId] = false;
+						});
+						
+						this.account.fields[field.fieldId] = [];
+
+						for(let i = 0; i < field.minEntries; i++) {
+							this.account.fields[field.fieldId].push(defaultObject);
+						}
 					});
-
-					this.account.fields[field.fieldId] = [];
-
-					for(let i = 0; i < field.minEntries; i++) {
-						this.account.fields[field.fieldId].push(defaultObject);
-					}
-				});
+				} else {
+					this.account = this.initialAccount;
+				}
 			});
 		});
 	}

@@ -8,7 +8,8 @@ module.exports = {
 	devtool: "inline-source-map",
 	output: {
 		path: `${__dirname}/dist/build/`,
-		filename: "[name].[hash].js"
+		filename: "[name].[hash].js",
+		publicPath: "/"
 	},
 	plugins: [
 		new VueLoaderPlugin(),

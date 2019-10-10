@@ -16,11 +16,23 @@ const router = new VueRouter({
 			component: () => import("./vue/pages/Homepage.vue")
 		},
 		{
+			path: "*",
+			component: () => import("./vue/pages/NotFound.vue")
+		},
+		{
 			path: "/add",
 			component: () => import("./vue/pages/AddAccount.vue")
-		}
+		},
+		{
+			path: "/edit/:accountId",
+			component: () => import("./vue/pages/EditAccount.vue")
+		},
 	]
 });
+
+// router.beforeEach((to, from, next) => {
+// 	next();
+// });
 
 io.init("http://localhost:8080");
 

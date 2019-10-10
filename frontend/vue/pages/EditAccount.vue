@@ -1,5 +1,5 @@
 <template>
-	<account-form :onSubmit="onSubmit"/>
+	<account-form v-if="account.version" :onSubmit="onSubmit" :initialAccount="account"/>
 </template>
 
 <script>
@@ -11,12 +11,13 @@ export default {
 	components: { AccountForm },
 	data: () => {
 		return {
-			
+			account: {},
+			accountId: ""
 		}
 	},
 	methods: {
 		onSubmit(account) {
-			this.socket.emit("addAccount", account, (res) => {
+			this.socket.emit("editAccount", account._id, account, (res) => {
 				console.log(res);
 				if (res.status === "success") {
 					this.$router.push("/")
@@ -25,8 +26,16 @@ export default {
 		}
 	},
 	mounted() {
+		this.accountId = this.$route.params.accountId;
 		io.getSocket(socket => {
 			this.socket = socket;
+
+			this.socket.emit("getAccount", this.accountId, res => {
+				console.log(res);
+				if (res.status === "success") {
+					this.account = res.account;
+				}
+			});
 		});
 	}
 };
