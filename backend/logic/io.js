@@ -11,6 +11,9 @@ const express = require("express");
 const http = require("http");
 const socketio = require('socket.io');
 
+let temporaryAutosuggestCache = {};
+let temporaryAutosuggestMap = {};
+
 module.exports = class extends coreClass {
 	constructor(name, moduleManager) {
 		super(name, moduleManager);
@@ -28,7 +31,47 @@ module.exports = class extends coreClass {
 
 			this.mongo = this.moduleManager.modules["mongo"];
 
+			this.mongo.models.accountSchema.find({}, null, { sort: "-version", limit: 1 }, (err, res) => {
+				if (!err) {
+					res[0].fields.forEach(field => {
+						field.fieldTypes.forEach(fieldType => {
+							if (fieldType.type === "text" && fieldType.autosuggestGroup) {
+								temporaryAutosuggestMap[`${field.fieldId}.${fieldType.fieldTypeId}`] = fieldType.autosuggestGroup;
+								temporaryAutosuggestCache[fieldType.autosuggestGroup] = [];
+							}
+						});
+					});
+
+					this.mongo.models.account.find({}, (err, accounts) => {
+						if (!err) {
+							accounts.forEach(account => {
+								Object.keys(temporaryAutosuggestMap).forEach(key => {
+									let autosuggestGroup = temporaryAutosuggestMap[key];
+									let fieldId = key.split(".")[0];
+									let fieldTypeId = key.split(".")[1];
+									account.fields[fieldId].forEach(field => {
+										if (temporaryAutosuggestCache[autosuggestGroup].indexOf(field[fieldTypeId]) === -1)
+											temporaryAutosuggestCache[autosuggestGroup].push(field[fieldTypeId]);
+									});
+								});
+							});
+
+							console.log(temporaryAutosuggestCache);
+							console.log(temporaryAutosuggestMap);
+						}
+					});
+				}
+			});
+
+			
+
 			this.handlers = {
+				"getAutosuggest": cb => {
+					cb({
+						autosuggest: temporaryAutosuggestCache
+					});
+				},
+
 				"getAccounts": cb => {
 					this.mongo.models.account.find({}, (err, accounts) => {
 						if (err)
@@ -66,11 +109,21 @@ module.exports = class extends coreClass {
 								status: "failure",
 								err: err
 							});
-						else
+						else {
+							Object.keys(temporaryAutosuggestMap).forEach(key => {
+								let autosuggestGroup = temporaryAutosuggestMap[key];
+								let fieldId = key.split(".")[0];
+								let fieldTypeId = key.split(".")[1];
+								account.fields[fieldId].forEach(field => {
+									if (temporaryAutosuggestCache[autosuggestGroup].indexOf(field[fieldTypeId]) === -1)
+										temporaryAutosuggestCache[autosuggestGroup].push(field[fieldTypeId]);
+								});
+							});
 							console.log("Added account!");
 							return cb({
 								status: "success"
 							});
+						}
 					});
 				},
 
@@ -81,11 +134,21 @@ module.exports = class extends coreClass {
 								status: "failure",
 								err: err
 							});
-						else
+						else {
+							Object.keys(temporaryAutosuggestMap).forEach(key => {
+								let autosuggestGroup = temporaryAutosuggestMap[key];
+								let fieldId = key.split(".")[0];
+								let fieldTypeId = key.split(".")[1];
+								account.fields[fieldId].forEach(field => {
+									if (temporaryAutosuggestCache[autosuggestGroup].indexOf(field[fieldTypeId]) === -1)
+										temporaryAutosuggestCache[autosuggestGroup].push(field[fieldTypeId]);
+								});
+							});
 							console.log("Editted account!");
 							return cb({
 								status: "success"
 							});
+						}
 					});
 				},
 

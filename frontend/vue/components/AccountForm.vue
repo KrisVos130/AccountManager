@@ -6,6 +6,7 @@
 			:minEntries="field.minEntries"
 			:maxEntries="field.maxEntries"
 			:initialEntries="account.fields[field.fieldId]"
+			:autosuggest="autosuggest"
 			:key="field.fieldId"
 			:ref="field.fieldId"
 			:fieldTypes="field.fieldTypes"/>
@@ -25,7 +26,8 @@ export default {
 	data: function() {
 		return {
 			fields: [],
-			account: {}
+			account: {},
+			autosuggest: {}
 		};
 	},
 	methods: {
@@ -69,6 +71,10 @@ export default {
 				} else {
 					this.account = this.initialAccount;
 				}
+			});
+
+			socket.emit("getAutosuggest", res => {
+				this.autosuggest = res.autosuggest;
 			});
 		});
 	}

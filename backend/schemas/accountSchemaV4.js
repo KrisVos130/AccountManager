@@ -1,7 +1,7 @@
 module.exports = {
 	name: "Account",
 	description: "Account schema",
-	version: 3,
+	version: 4,
 	fields: [
 		{
 			name: "Name",
@@ -23,7 +23,8 @@ module.exports = {
 				{
 					type: "text",
 					fill: true,
-					fieldTypeId: "domain"
+					fieldTypeId: "domain",
+					autosuggestGroup: "domain"
 				}
 			],
 			minEntries: 0,
@@ -79,7 +80,8 @@ module.exports = {
 				{
 					type: "text",
 					fieldTypeId: "email",
-					fill: true
+					fill: true,
+					autosuggestGroup: "email"
 				}
 			],
 			minEntries: 0,
@@ -268,7 +270,8 @@ module.exports = {
 				{
 					type: "text",
 					fieldTypeId: "recoveryEmail",
-					fill: true
+					fill: true,
+					autosuggestGroup: "email"
 				}
 			],
 			minEntries: 0,

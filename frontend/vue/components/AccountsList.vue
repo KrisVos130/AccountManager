@@ -1,7 +1,7 @@
 <template>
 	<div class="accounts-list">
 		<div class="account" v-for="(account, accountIndex) in accounts">
-			Account
+			{{ account.fields.name[0].name }}
 			<router-link
 				:to="`edit/${account._id}`"
 			>

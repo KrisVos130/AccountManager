@@ -4,7 +4,7 @@
 		<button v-if="entries.length === 0" @click="addEntry()" type="button">+</button>
 		<div class="control-row" v-for="(entry, entryIndex) in entries">
 			<div class="control-col" v-for="(fieldType, fieldIndex) in fieldTypes" :class="{ 'fill-remaining': fieldType.fill }">
-				<input name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]"/>
+				<input name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]" v-on:blur="blurInput(entryIndex, fieldType.fieldTypeId)" v-on:focus="focusInput(entryIndex, fieldType.fieldTypeId)" v-on:keydown="keydownInput(entryIndex, fieldType.fieldTypeId)" />
 				<select name="name" v-if="fieldType.type === 'select'" class="fill-remaining" v-model="entry[fieldType.fieldTypeId]">
 					<option v-for="option in fieldType.options" :value="option.value">{{option.text}}</option>
 				</select>
@@ -13,8 +13,15 @@
 				<button v-if="fieldType.extraButtons" v-for="buttonInfo in fieldType.extraButtons" type="button" :class="[buttonInfo.style]">{{buttonInfo.icon}}</button>
 				<button v-if="entryIndex + 1 === entries.length && entryIndex + 1 < maxEntries && fieldIndex + 1 === fieldTypes.length" @click="addEntry()" type="button">+</button>
 				<button v-if="entries.length > minEntries && fieldIndex + 1 === fieldTypes.length" @click="removeEntry(entryIndex)" type="button">-</button>
+
+				<div v-if="fieldType.autosuggestGroup && (focusedInput === `${entryIndex}.${fieldType.fieldTypeId}` || autosuggestHover === `${entryIndex}.${fieldType.fieldTypeId}`)" class="autosuggest-container" @mouseover="focusAutosuggestContainer(entryIndex, fieldType.fieldTypeId)" @mouseleave="blurAutosuggestContainer()">
+					<div v-for="autosuggestItem in filter(autosuggest[fieldType.autosuggestGroup], entry[fieldType.fieldTypeId])" class="autosuggest-item" @click="selectAutosuggest(entryIndex, fieldType.fieldTypeId, autosuggestItem)">
+						{{ autosuggestItem }}
+					</div>
+				</div>
 			</div>
 		</div>
+		
 	</div>
 </template>
 
@@ -26,18 +33,18 @@ function Field() {
 export default {
 	data: function() {
 		return {
-			entries: [...this.initialEntries]
+			entries: [...this.initialEntries],
+			focusedInput: "",
+			activeAutosuggestHover: ""
 		};
-	},
-	methods: {
-		
 	},
 	props: {
 		name: String,
 		fieldTypes: Array,
 		minEntries: Number,
 		maxEntries: Number,
-		initialEntries: Array
+		initialEntries: Array,
+		autosuggest: Object
 	},
 	mounted() {
 		
@@ -56,6 +63,27 @@ export default {
 		},
 		toggleCheckbox(entryIndex, fieldTypeId) {
 			this.entries[entryIndex][fieldTypeId] = !this.entries[entryIndex][fieldTypeId];
+		},
+		selectAutosuggest(entryIndex, fieldTypeId, autosuggestItem) {
+			this.entries[entryIndex][fieldTypeId] = autosuggestItem;
+		},
+		blurInput(entryIndex, fieldTypeId) {
+			this.focusedInput = "";
+		},
+		focusInput(entryIndex, fieldTypeId) {
+			this.focusedInput = `${entryIndex}.${fieldTypeId}`;
+		},
+		keydownInput(entryIndex, fieldTypeId) {
+
+		},
+		focusAutosuggestContainer(entryIndex, fieldTypeId) {
+			this.autosuggestHover = `${entryIndex}.${fieldTypeId}`;
+		},
+		blurAutosuggestContainer() {
+			this.autosuggestHover = "";
+		},
+		filter(autosuggest, value) {
+			return autosuggest.filter(autosuggestItem => autosuggestItem.toLowerCase().startsWith(value.toLowerCase())).sort();
 		}
 	}
 };
@@ -83,6 +111,7 @@ export default {
 
 	.control-col {
 		display: flex;
+		position: relative;
 		button:last-of-type {
 			border-radius: 0 5px 5px 0;
 		}
@@ -91,6 +120,26 @@ export default {
 			border-right: none;
 			border-top-right-radius: 0;
 			border-bottom-right-radius: 0;
+		}
+
+		.autosuggest-container {
+			position: absolute;
+			top: 31px;
+			width: 100%;
+			border-radius: 5px 5px 5px 5px;
+			border: solid .5px #464646;
+			z-index: 10;
+
+			.autosuggest-item {
+				padding: 8px;
+				cursor: pointer;
+				background-color: white;
+				
+
+				&:hover, &:focus {
+					background-color: lightgray;
+				}
+			}
 		}
 	}
 
