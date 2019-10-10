@@ -27,11 +27,13 @@ module.exports = class extends coreClass {
 			})
 				.then(() => {
 					this.schemas = {
-						accountSchema: new mongoose.Schema(require(`./schemas/accountSchema`))
+						accountSchema: new mongoose.Schema(require(`./schemas/accountSchema`)),
+						account: new mongoose.Schema(require(`./schemas/account`))
 					};
 		
 					this.models = {
-						accountSchema: mongoose.model('accountSchema', this.schemas.accountSchema)
+						accountSchema: mongoose.model('accountSchema', this.schemas.accountSchema),
+						account: mongoose.model('account', this.schemas.account)
 					};
 
 					mongoose.connection.on('error', err => {

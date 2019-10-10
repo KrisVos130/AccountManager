@@ -30,13 +30,37 @@ module.exports = class extends coreClass {
 
 			this.handlers = {
 				"getAccounts": cb => {
-					cb({
-						accounts: []
+					this.mongo.models.account.find({}, (err, accounts) => {
+						if (err)
+							return cb({
+								status: "failure",
+								err: err
+							});
+						else
+							return cb({
+								status: "success",
+								accounts
+							});
+					});
+				},
+
+				"addAccount": (cb, account) => {
+					this.mongo.models.account.create(account, (err) => {
+						if (err)
+							return cb({
+								status: "failure",
+								err: err
+							});
+						else
+							console.log("Added account!");
+							return cb({
+								status: "success"
+							});
 					});
 				},
 
 				"getAccountSchema": cb => {
-					this.mongo.models.accountSchema.find({}, null, { sort: ["version"], limit: 1 }, (err, res) => {
+					this.mongo.models.accountSchema.find({}, null, { sort: "-version", limit: 1 }, (err, res) => {
 						if (err || !res || res.length !== 1)
 							return cb({
 								status: "failure",

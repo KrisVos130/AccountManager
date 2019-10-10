@@ -4,11 +4,11 @@
 		<button v-if="entries.length === 0" @click="addEntry()" type="button">+</button>
 		<div class="control-row" v-for="(entry, entryIndex) in entries">
 			<div class="control-col" v-for="(fieldType, fieldIndex) in fieldTypes" :class="{ 'fill-remaining': fieldType.fill }">
-				<input name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldIndex]"/>
-				<select name="name" v-if="fieldType.type === 'select'" class="fill-remaining" v-model="entry[fieldIndex]">
+				<input name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]"/>
+				<select name="name" v-if="fieldType.type === 'select'" class="fill-remaining" v-model="entry[fieldType.fieldTypeId]">
 					<option v-for="option in fieldType.options" :value="option.value">{{option.text}}</option>
 				</select>
-				<div tabindex="0" v-on:keyup.enter="toggleCheckbox(entryIndex, fieldIndex)" v-on:keyup.space="toggleCheckbox(entryIndex, fieldIndex)" name="name" class="checkbox" v-if="fieldType.type === 'checkbox'" :class="{ checked: entry[fieldIndex] }" @click="toggleCheckbox(entryIndex, fieldIndex)"></div>
+				<div tabindex="0" v-on:keyup.enter="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" v-on:keyup.space="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" name="name" class="checkbox" v-if="fieldType.type === 'checkbox'" :class="{ checked: entry[fieldType.fieldTypeId] }" @click="toggleCheckbox(entryIndex, fieldType.fieldTypeId)"></div>
 
 				<button v-if="fieldType.extraButtons" v-for="buttonInfo in fieldType.extraButtons" type="button" :class="[buttonInfo.style]">{{buttonInfo.icon}}</button>
 				<button v-if="entryIndex + 1 === entries.length && entryIndex + 1 < maxEntries && fieldIndex + 1 === fieldTypes.length" @click="addEntry()" type="button">+</button>
@@ -26,7 +26,7 @@ function Field() {
 export default {
 	data: function() {
 		return {
-			entries: [this.initialEntries]
+			entries: [...this.initialEntries]
 		};
 	},
 	methods: {
@@ -40,21 +40,22 @@ export default {
 		initialEntries: Array
 	},
 	mounted() {
-
+		
 	},
 	methods: {
 		addEntry() {
-			let emptyEntry = [];
+			let emptyEntry = {};
 			this.fieldTypes.forEach((fieldType) => {
-				emptyEntry.push(null);
+				if (fieldType.type === "text" || fieldType.type === "select") emptyEntry[fieldType.fieldTypeId] = "";
+				else if (fieldType.type === "checkbox") emptyEntry[fieldType.fieldTypeId] = false;
 			});
 			this.entries.push(emptyEntry);
 		},
 		removeEntry(index) {
 			this.entries.splice(index, 1);
 		},
-		toggleCheckbox(entryIndex, fieldIndex) {
-			this.$set(this.entries[entryIndex], fieldIndex, !this.entries[entryIndex][fieldIndex]);
+		toggleCheckbox(entryIndex, fieldTypeId) {
+			this.entries[entryIndex][fieldTypeId] = !this.entries[entryIndex][fieldTypeId];
 		}
 	}
 };

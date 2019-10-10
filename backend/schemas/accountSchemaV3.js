@@ -1,7 +1,7 @@
 module.exports = {
 	name: "Account",
 	description: "Account schema",
-	version: "1",
+	version: 3,
 	fields: [
 		{
 			name: "Name",
@@ -69,7 +69,7 @@ module.exports = {
 					fieldTypeId: "accountExists"
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -133,7 +133,7 @@ module.exports = {
 					fieldTypeId: "usesPassword"
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -258,7 +258,7 @@ module.exports = {
 					fill: true
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -309,7 +309,7 @@ module.exports = {
 					fieldTypeId: "in1password"
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -321,7 +321,7 @@ module.exports = {
 					fieldTypeId: "deleted"
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -334,7 +334,7 @@ module.exports = {
 					fill: true
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -346,7 +346,7 @@ module.exports = {
 					fieldTypeId: "serviceAccessible"
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -358,7 +358,7 @@ module.exports = {
 					fieldTypeId: "requestedDeletion"
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -371,7 +371,7 @@ module.exports = {
 					fill: true
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -383,19 +383,7 @@ module.exports = {
 					fieldTypeId: "toDelete"
 				}
 			],
-			minEntries: 1,
-			maxEntries: 1
-		},
-		{
-			name: "To delete",
-			fieldId: "toDelete",
-			fieldTypes: [
-				{
-					type: "checkbox",
-					fieldTypeId: "toDelete"
-				}
-			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		},
 		{
@@ -408,7 +396,7 @@ module.exports = {
 					fill: true
 				}
 			],
-			minEntries: 1,
+			minEntries: 0,
 			maxEntries: 1
 		}
 	]
