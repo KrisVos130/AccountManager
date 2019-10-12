@@ -3,3 +3,4 @@ log/
 default.json
 .database
 scripts/
+.env
