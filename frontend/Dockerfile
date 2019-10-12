@@ -5,7 +5,6 @@ RUN apt-get install nginx -y
 
 RUN npm install -g yarn
 
-RUN yarn global add snyk
 RUN yarn global add webpack
 RUN yarn global add webpack-cli
 RUN yarn global add webpack-dev-server
