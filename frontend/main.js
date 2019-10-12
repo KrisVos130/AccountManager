@@ -34,7 +34,9 @@ const router = new VueRouter({
 // 	next();
 // });
 
-io.init("http://localhost:8080");
+lofig.get("backendUrl").then(url => {
+	io.init(url);
+});
 
 new Vue({
 	router,
