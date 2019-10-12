@@ -1,0 +1,32 @@
+version: '2'
+services:
+  backend:
+    build: ./backend
+    ports:
+    - "${BACKEND_PORT}:8080"
+    volumes:
+    - ./backend:/opt/app
+    - ./log:/opt/log
+    links:
+    - mongo
+  frontend:
+    build: ./frontend
+    ports:
+    - "${FRONTEND_PORT}:80"
+    volumes:
+    - ./frontend:/opt/app
+  mongo:
+    image: mongo:4.0
+    ports:
+    - "${MONGO_PORT}:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_USER_USERNAME=${MONGO_USER_USERNAME}
+      - MONGO_USER_PASSWORD=${MONGO_USER_PASSWORD}
+    volumes:
+      - ./setup-mongo-docker.sh:/docker-entrypoint-initdb.d/setup-mongo.sh

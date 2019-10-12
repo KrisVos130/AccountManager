@@ -7,6 +7,7 @@
     "socket.io": "^2.3.0"
   },
   "scripts": {
-    "dev": "nodemon ."
+    "dev": "nodemon .",
+    "docker:dev": "nodemon -L /opt/app"
   }
 }
