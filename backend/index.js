@@ -162,6 +162,8 @@ moduleManager.addModule("logger");
 moduleManager.addModule("io");
 moduleManager.addModule("util");
 moduleManager.addModule("mongo");
+moduleManager.addModule("account");
+moduleManager.addModule("accountSchema");
 
 moduleManager.initialize();
 

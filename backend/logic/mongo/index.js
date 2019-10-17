@@ -208,17 +208,17 @@ module.exports = class extends coreClass {
 		})
 	}
 
-	get schemas() {
+	async schema(name) {
 		return new Promise(async resolve => {
 			try { await this._validateHook(); } catch { return; }
-			resolve(this._schemas);
+			resolve(this._schemas[name]);
 		});
 	}
 
-	get models() {
+	async model(name) {
 		return new Promise(async resolve => {
 			try { await this._validateHook(); } catch { return; }
-			resolve(this._models);
+			resolve(this._models[name]);
 		});
 	}
 }

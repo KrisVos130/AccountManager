@@ -1,73 +1,56 @@
 const moduleManager = require("../../../index");
 
 const mongoModule = moduleManager.modules["mongo"];
+const accountSchemaModule = moduleManager.modules["accountSchema"];
 
 module.exports = {
 	"getLatest": cb => {
-		mongoModule.models.then(models => {
-			models.accountSchema.find({}, null, { sort: "-version", limit: 1 }, (err, res) => {
-				if (err || !res || res.length !== 1)
-					return cb({
-						status: "failure",
-						message: "Something went wrong."
-					});
-				else
-					return cb({
-						status: "success",
-						schema: res[0]
-					});
+		accountSchemaModule.getLatest().then(schema => {
+			cb({
+				status: "success",
+				schema
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
 			});
 		});
 	},
 
 	"getAll": cb => {
-		mongoModule.models.then(models => {
-			models.accountSchema.find({}, null, { sort: "-version" }, (err, res) => {
-				if (err || !res)
-					return cb({
-						status: "failure",
-						message: "Something went wrong."
-					});
-				else
-					return cb({
-						status: "success",
-						schemas: res
-					});
+		accountSchemaModule.getAll().then(schemas => {
+			cb({
+				status: "success",
+				schemas
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
 			});
 		});
 	},
 
 	"getById": (cb, schemaId) => {
-		mongoModule.models.then(models => {
-			models.accountSchema.findById(schemaId, (err, res) => {
-				if (err || !res)
-					return cb({
-						status: "failure",
-						message: "Something went wrong."
-					});
-				else
-					return cb({
-						status: "success",
-						schema: res
-					});
+		accountSchemaModule.getById(schemaId).then(schema => {
+			cb({
+				status: "success",
+				schema
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
 			});
 		});
 	},
 
 	"import": (cb, name) => {
-		mongoModule.models.then(models => {
-			mongoModule.schemas.then(models => {
-				models.accountSchema.create(schemas[name], (err) => {
-					if (err)
-						return cb({
-							status: "failure",
-							err: err
-						});
-					else
-						return cb({
-							status: "success"
-						});
-				});
+		accountSchemaModule.import(name).then(() => {
+			cb({
+				status: "success"
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
 			});
 		});
 	}

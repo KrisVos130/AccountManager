@@ -14,19 +14,20 @@ module.exports = class extends coreClass {
 	}
 
 	initialize() {
-		return new Promise((resolve, reject) => {
+		return new Promise(async (resolve, reject) => {
 			this.setStage(1);
 
-			this.mongo = this.moduleManager.modules["mongo"];
+			this.mongoModule = this.moduleManager.modules["mongo"];
 
 			this._autosuggestCache = {};
 			this._autosuggestMap = {};
 
+			this.accountSchemaModel = await this.mongoModule.model("accountSchema");
+			this.accountModel = await this.mongoModule.model("account");
+
 			async.waterfall([
 				(next) => {
-					this.mongo.models.then(models => {
-						models.accountSchema.find({}, null, { sort: "-version", limit: 1 }, next);
-					});
+					this.accountSchemaModel.find({}, null, { sort: "-version", limit: 1 }, next);
 				},
 
 				(schemas, next) => {
@@ -39,9 +40,7 @@ module.exports = class extends coreClass {
 						});
 					});
 
-					this.mongo.models.then(models => {
-						models.account.find({}, next);
-					});
+					this.accountModel.find({}, next);
 				},
 
 				(accounts, next) => {
