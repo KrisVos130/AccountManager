@@ -1,12 +1,12 @@
 <template>
-	<div>
-		
-	</div>
+	<navbar>
+		<router-link to="/">Homepage</router-link>
+		<router-link to="/accounts">Accounts</router-link>
+		<router-link to="/schemas">Schemas</router-link>
+	</navbar>
 </template>
 
 <script>
-import io from "../../io.js";
-
 export default {
 	components: {},
 	data: () => {
@@ -18,9 +18,7 @@ export default {
 		
 	},
 	mounted() {
-		io.getSocket(socket => {
-			this.socket = socket;
-		});
+		
 	}
 };
 </script>

@@ -20,11 +20,23 @@ const router = new VueRouter({
 			component: () => import("./vue/pages/NotFound.vue")
 		},
 		{
-			path: "/add",
+			path: "/accounts",
+			component: () => import("./vue/pages/Accounts.vue")
+		},
+		{
+			path: "/schemas",
+			component: () => import("./vue/pages/Schemas.vue")
+		},
+		{
+			path: "/schemas/:schemaId",
+			component: () => import("./vue/pages/ViewSchema.vue")
+		},
+		{
+			path: "/accounts/add",
 			component: () => import("./vue/pages/AddAccount.vue")
 		},
 		{
-			path: "/edit/:accountId",
+			path: "/accounts/edit/:accountId",
 			component: () => import("./vue/pages/EditAccount.vue")
 		},
 	]
@@ -34,6 +46,7 @@ const router = new VueRouter({
 // 	next();
 // });
 
+lofig.folder = "/config/default.json";
 lofig.get("backendUrl").then(url => {
 	io.init(url);
 });

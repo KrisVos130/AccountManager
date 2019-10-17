@@ -1,5 +1,6 @@
 <template>
 	<form>
+		<p><b>Schema version</b>: {{account.version}}</p>
 		<field
 			v-for="field in fields"
 			:name="field.name"

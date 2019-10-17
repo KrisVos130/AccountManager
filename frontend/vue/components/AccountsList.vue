@@ -3,7 +3,7 @@
 		<div class="account" v-for="(account, accountIndex) in accounts">
 			{{ account.fields.name[0].name }}
 			<router-link
-				:to="`edit/${account._id}`"
+				:to="`/accounts/edit/${account._id}`"
 			>
 				Edit account
 			</router-link>

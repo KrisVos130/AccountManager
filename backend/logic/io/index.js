@@ -2,7 +2,7 @@
 
 // This file contains all the logic for Socket.IO
 
-const coreClass = require("../core");
+const coreClass = require("../../core");
 
 const async = require("async");
 const config = require("config");
@@ -163,6 +163,36 @@ module.exports = class extends coreClass {
 							return cb({
 								status: "success",
 								schema: res[0]
+							});
+					});
+				},
+
+				"getAccountSchemas": cb => {
+					this.mongo.models.accountSchema.find({}, null, { sort: "-version" }, (err, res) => {
+						if (err || !res)
+							return cb({
+								status: "failure",
+								message: "Something went wrong."
+							});
+						else
+							return cb({
+								status: "success",
+								schemas: res
+							});
+					});
+				},
+
+				"getAccountSchemaById": (cb, schemaId) => {
+					this.mongo.models.accountSchema.findById(schemaId, (err, res) => {
+						if (err || !res)
+							return cb({
+								status: "failure",
+								message: "Something went wrong."
+							});
+						else
+							return cb({
+								status: "success",
+								schema: res
 							});
 					});
 				},
