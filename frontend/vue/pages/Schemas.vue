@@ -20,7 +20,7 @@ export default {
 	},
 	methods: {
 		importAccountSchema() {
-			this.socket.emit("importAccountSchema", this.importAccountSchemaName, (res) => {
+			this.socket.emit("accountSchema.import", this.importAccountSchemaName, (res) => {
 				console.log(res);
 				alert(res.status);
 			});
@@ -30,7 +30,7 @@ export default {
 		io.getSocket(socket => {
 			this.socket = socket;
 
-			this.socket.emit("getAccountSchemas", res => {
+			this.socket.emit("accountSchema.getAll", res => {
 				this.schemas = res.schemas;
 			});
 		});

@@ -29,7 +29,8 @@ export default {
 		io.getSocket(socket => {
 			this.socket = socket;
 
-			socket.emit("getAccounts", res => {
+			socket.emit("account.getAll", res => {
+				console.log(res);
 				this.accounts = res.accounts;
 			});
 		});

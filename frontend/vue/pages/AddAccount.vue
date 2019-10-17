@@ -16,7 +16,7 @@ export default {
 	},
 	methods: {
 		onSubmit(account) {
-			this.socket.emit("addAccount", account, (res) => {
+			this.socket.emit("account.add", account, (res) => {
 				console.log(res);
 				if (res.status === "success") {
 					this.$router.push("/")

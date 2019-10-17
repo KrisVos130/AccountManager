@@ -14,8 +14,8 @@ module.exports = class extends coreClass {
 		return new Promise((resolve, reject) => {
 			this.setStage(1);
 
-			this.schemas = {};
-			this.models = {};
+			this._schemas = {};
+			this._models = {};
 
 			const mongoUrl = config.get("mongo").url;
 
@@ -26,14 +26,14 @@ module.exports = class extends coreClass {
 				reconnectTries: 10
 			})
 				.then(() => {
-					this.schemas = {
+					this._schemas = {
 						accountSchema: new mongoose.Schema(require(`./schemas/accountSchema`)),
 						account: new mongoose.Schema(require(`./schemas/account`))
 					};
 		
-					this.models = {
-						accountSchema: mongoose.model('accountSchema', this.schemas.accountSchema),
-						account: mongoose.model('account', this.schemas.account)
+					this._models = {
+						accountSchema: mongoose.model('accountSchema', this._schemas.accountSchema),
+						account: mongoose.model('account', this._schemas.account)
 					};
 
 					mongoose.connection.on('error', err => {
@@ -206,5 +206,19 @@ module.exports = class extends coreClass {
 					reject(err);
 				});
 		})
+	}
+
+	get schemas() {
+		return new Promise(async resolve => {
+			try { await this._validateHook(); } catch { return; }
+			resolve(this._schemas);
+		});
+	}
+
+	get models() {
+		return new Promise(async resolve => {
+			try { await this._validateHook(); } catch { return; }
+			resolve(this._models);
+		});
 	}
 }

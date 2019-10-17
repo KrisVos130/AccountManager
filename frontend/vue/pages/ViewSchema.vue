@@ -51,7 +51,7 @@ export default {
 		io.getSocket(socket => {
 			this.socket = socket;
 
-			this.socket.emit("getAccountSchemaById", this.schemaId, res => {
+			this.socket.emit("accountSchema.getLatest", this.schemaId, res => {
 				if (res.status === "success") {
 					this.schema = res.schema;
 				}

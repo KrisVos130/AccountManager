@@ -50,7 +50,7 @@ export default {
 		io.getSocket(socket => {
 			this.socket = socket;
 
-			socket.emit("getAccountSchema", res => {
+			socket.emit("accountSchema.getLatest", res => {
 				this.fields = res.schema.fields;
 				if (!this.initialAccount) {
 					this.account.fields = {};
@@ -74,7 +74,7 @@ export default {
 				}
 			});
 
-			socket.emit("getAutosuggest", res => {
+			socket.emit("util.getAutosuggest", res => {
 				this.autosuggest = res.autosuggest;
 			});
 		});

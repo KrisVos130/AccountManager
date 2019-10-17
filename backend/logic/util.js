@@ -1,0 +1,95 @@
+'use strict';
+
+const async = require("async");
+
+const coreClass = require("../core");
+
+const config = require('config');
+
+module.exports = class extends coreClass {
+	constructor(name, moduleManager) {
+		super(name, moduleManager);
+
+		this.dependsOn = ["mongo"];
+	}
+
+	initialize() {
+		return new Promise((resolve, reject) => {
+			this.setStage(1);
+
+			this.mongo = this.moduleManager.modules["mongo"];
+
+			this._autosuggestCache = {};
+			this._autosuggestMap = {};
+
+			async.waterfall([
+				(next) => {
+					this.mongo.models.then(models => {
+						models.accountSchema.find({}, null, { sort: "-version", limit: 1 }, next);
+					});
+				},
+
+				(schemas, next) => {
+					schemas[0].fields.forEach(field => {
+						field.fieldTypes.forEach(fieldType => {
+							if (fieldType.type === "text" && fieldType.autosuggestGroup) {
+								this._autosuggestMap[`${field.fieldId}.${fieldType.fieldTypeId}`] = fieldType.autosuggestGroup;
+								this._autosuggestCache[fieldType.autosuggestGroup] = [];
+							}
+						});
+					});
+
+					this.mongo.models.then(models => {
+						models.account.find({}, next);
+					});
+				},
+
+				(accounts, next) => {
+					accounts.forEach(account => {
+						Object.keys(this._autosuggestMap).forEach(key => {
+							let autosuggestGroup = this._autosuggestMap[key];
+							let fieldId = key.split(".")[0];
+							let fieldTypeId = key.split(".")[1];
+							account.fields[fieldId].forEach(field => {
+								if (this._autosuggestCache[autosuggestGroup].indexOf(field[fieldTypeId]) === -1)
+									this._autosuggestCache[autosuggestGroup].push(field[fieldTypeId]);
+							});
+						});
+					});
+
+					next();
+				}
+			], (err) => {
+				if (err) reject(new Error(err));
+				else resolve();
+			});
+		})
+	}
+
+	get autosuggestCache() {
+		return new Promise(async resolve => {
+			try { await this._validateHook(); } catch { return; }
+			resolve(this._autosuggestCache);
+		});
+	}
+
+	get autosuggestMap() {
+		return new Promise(async resolve => {
+			try { await this._validateHook(); } catch { return; }
+			resolve(this._autosuggestMap);
+		});
+	}
+
+	async addAutosuggestAccount(account) {
+		try { await this._validateHook(); } catch { return; }
+		Object.keys(this._autosuggestMap).forEach(key => {
+			let autosuggestGroup = this._autosuggestMap[key];
+			let fieldId = key.split(".")[0];
+			let fieldTypeId = key.split(".")[1];
+			account.fields[fieldId].forEach(field => {
+				if (this._autosuggestCache[autosuggestGroup].indexOf(field[fieldTypeId]) === -1)
+					this._autosuggestCache[autosuggestGroup].push(field[fieldTypeId]);
+			});
+		});
+	}
+}

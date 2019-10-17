@@ -160,6 +160,7 @@ module.exports = moduleManager;
 
 moduleManager.addModule("logger");
 moduleManager.addModule("io");
+moduleManager.addModule("util");
 moduleManager.addModule("mongo");
 
 moduleManager.initialize();
