@@ -4,8 +4,8 @@
 		<button v-if="entries.length === 0" @click="addEntry()" type="button">+</button>
 		<div class="control-row" v-for="(entry, entryIndex) in entries">
 			<div class="control-col" v-for="(fieldType, fieldIndex) in fieldTypes" :class="{ 'fill-remaining': fieldType.fill }">
-				<input name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]" v-on:blur="blurInput(entryIndex, fieldType.fieldTypeId)" v-on:focus="focusInput(entryIndex, fieldType.fieldTypeId)" v-on:keydown="keydownInput(entryIndex, fieldType.fieldTypeId)" />
-				<select name="name" v-if="fieldType.type === 'select'" class="fill-remaining" v-model="entry[fieldType.fieldTypeId]">
+				<input name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]" @change="onInputChange()" v-on:blur="blurInput(entryIndex, fieldType.fieldTypeId)" v-on:focus="focusInput(entryIndex, fieldType.fieldTypeId)" v-on:keydown="keydownInput(entryIndex, fieldType.fieldTypeId)" />
+				<select name="name" v-if="fieldType.type === 'select'" class="fill-remaining" v-model="entry[fieldType.fieldTypeId]" @change="onSelectChange()">
 					<option v-for="option in fieldType.options" :value="option.value">{{option.text}}</option>
 				</select>
 				<div tabindex="0" v-on:keyup.enter="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" v-on:keyup.space="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" name="name" class="checkbox" v-if="fieldType.type === 'checkbox'" :class="{ checked: entry[fieldType.fieldTypeId] }" @click="toggleCheckbox(entryIndex, fieldType.fieldTypeId)"></div>
@@ -45,7 +45,8 @@ export default {
 		minEntries: Number,
 		maxEntries: Number,
 		initialEntries: Array,
-		autosuggest: Object
+		autosuggest: Object,
+		onChange: Function
 	},
 	mounted() {
 		
@@ -58,12 +59,15 @@ export default {
 				else if (fieldType.type === "checkbox") emptyEntry[fieldType.fieldTypeId] = false;
 			});
 			this.entries.push(emptyEntry);
+			this.onChange();
 		},
 		removeEntry(index) {
 			this.entries.splice(index, 1);
+			this.onChange();
 		},
 		toggleCheckbox(entryIndex, fieldTypeId) {
 			this.entries[entryIndex][fieldTypeId] = !this.entries[entryIndex][fieldTypeId];
+			this.onChange();
 		},
 		selectAutosuggest(entryIndex, fieldTypeId, autosuggestItem) {
 			this.entries[entryIndex][fieldTypeId] = autosuggestItem;
@@ -82,6 +86,12 @@ export default {
 		},
 		blurAutosuggestContainer() {
 			this.autosuggestHover = "";
+		},
+		onSelectChange() {
+			this.onChange();
+		},
+		onInputChange() {
+			this.onChange();
 		},
 		filter(autosuggest, value) {
 			return autosuggest.filter(autosuggestItem => autosuggestItem.toLowerCase().startsWith(value.toLowerCase())).sort();

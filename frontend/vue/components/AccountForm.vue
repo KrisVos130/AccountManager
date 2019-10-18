@@ -3,6 +3,7 @@
 		<p><b>Schema version</b>: {{account.version}}</p>
 		<field
 			v-for="field in fields"
+			v-if="dependencyChecksOut(field.fieldId)"
 			:name="field.name"
 			:minEntries="field.minEntries"
 			:maxEntries="field.maxEntries"
@@ -10,6 +11,7 @@
 			:autosuggest="autosuggest"
 			:key="field.fieldId"
 			:ref="field.fieldId"
+			:onChange="onFieldChange(field.fieldId)"
 			:fieldTypes="field.fieldTypes"/>
 			<button @click="submit()" type="button" class="button">
 				Submit
@@ -28,18 +30,32 @@ export default {
 		return {
 			fields: [],
 			account: {},
-			autosuggest: {}
+			autosuggest: {},
+			dependencies: {}
 		};
 	},
 	methods: {
 		submit() {
 			let account = JSON.parse(JSON.stringify(this.account));
-			let fields = {};
+			let fields = JSON.parse(JSON.stringify(this.templateAccount)).fields;
 			Object.keys(account.fields).forEach(fieldId => {
-				fields[fieldId] = this.$refs[fieldId][0].entries;
+				if (this.$refs[fieldId]) fields[fieldId] = this.$refs[fieldId][0].entries;
 			});
 			account.fields = fields;
 			this.onSubmit(account);
+		},
+		dependencyChecksOut(fieldId) {
+			if (!this.dependencies[fieldId]) return true;
+			let dependency = this.dependencies[fieldId];
+			let dependencyFieldId = dependency.fieldId;
+			if (!this.dependencyChecksOut(dependencyFieldId)) return false;
+			let dependencyEval = dependency.eval.replace("{fields}", "this.account.fields");
+			return eval(dependencyEval);
+		},
+		onFieldChange(fieldId) {
+			return () => {
+				this.account.fields[fieldId] = this.$refs[fieldId][0].entries;
+			};
 		}
 	},
 	props: {
@@ -52,6 +68,7 @@ export default {
 
 			socket.emit("accountSchema.getLatest", res => {
 				this.fields = res.schema.fields;
+				this.dependencies = res.schema.dependencies;
 				if (!this.initialAccount) {
 					this.account.fields = {};
 					this.account.version = res.schema.version;
@@ -69,8 +86,11 @@ export default {
 							this.account.fields[field.fieldId].push(defaultObject);
 						}
 					});
+
+					this.templateAccount = this.account;
 				} else {
 					this.account = this.initialAccount;
+					this.templateAccount = this.initialAccount;
 				}
 			});
 

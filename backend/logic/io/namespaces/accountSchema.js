@@ -50,7 +50,8 @@ module.exports = {
 			});
 		}).catch(err => {
 			cb({
-				status: "failure"
+				status: "failure",
+				error: err.message
 			});
 		});
 	}
