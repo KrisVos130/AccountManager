@@ -25,7 +25,7 @@ export default {
 			this.socket.emit("account.editById", account._id, account, (res) => {
 				console.log(res);
 				if (res.status === "success") {
-					this.$router.push("/")
+					this.$router.push("/accounts")
 				}
 			});
 		}

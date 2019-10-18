@@ -24,7 +24,7 @@ export default {
 			this.socket.emit("account.add", account, (res) => {
 				console.log(res);
 				if (res.status === "success") {
-					this.$router.push("/")
+					this.$router.push("/accounts")
 				}
 			});
 		}
