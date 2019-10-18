@@ -31,6 +31,20 @@ module.exports = class extends coreClass {
 
 			this.namespaces = require("./namespaces");
 
+			io.use((socket, next) => {
+				const passcode = socket.request._query.passcode;
+				if (passcode === config.get("passcode")) next();
+				else {
+					this.logger.error("IO_MODULE", "Blocked unauthorized user from connecting.");
+					let error = new Error();
+					error.data = {
+						type: "CONNECT_ERROR",
+						message: "Not authorized."
+					};
+					next(error);
+				}
+			});
+
 			io.on('connection', (socket) => {
 				console.log('a user connected');
 

@@ -1,3 +1,7 @@
 {
-	"fancyConsole": true
+	"fancyConsole": true,
+	"mongo": {
+		"url": ""
+	},
+	"passcode": "Secret"
 }

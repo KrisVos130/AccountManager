@@ -28,6 +28,10 @@ const router = new VueRouter({
 			component: () => import("./vue/pages/Schemas.vue")
 		},
 		{
+			path: "/options",
+			component: () => import("./vue/pages/Options.vue")
+		},
+		{
 			path: "/schemas/:schemaId",
 			component: () => import("./vue/pages/ViewSchema.vue")
 		},

@@ -15,6 +15,11 @@
 				Schemas
 			</a>
 		</router-link>
+		<router-link to="/options" v-slot="{ href, navigate, isExactActive }">
+			<a :class="{ 'active': isExactActive }" :href="href" @click="navigate">
+				Options
+			</a>
+		</router-link>
 	</navbar>
 </template>
 

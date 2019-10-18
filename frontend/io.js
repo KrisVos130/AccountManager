@@ -62,7 +62,10 @@ export default {
 	},
 
 	init(url) {
-		this.socket = window.socket = io(url);
+		const passcode = localStorage.getItem("passcode") || "";
+		this.socket = window.socket = io(url, {
+			query: `passcode=${passcode}`
+		});
 
 		this.socket.on("connect", () => {
 			callbacks.onConnect.temp.forEach(cb => cb());
@@ -79,6 +82,14 @@ export default {
 			console.log("IO: SOCKET CONNECT ERROR");
 			callbacks.onConnectError.temp.forEach(cb => cb());
 			callbacks.onConnectError.persist.forEach(cb => cb());
+		});
+
+		this.socket.on("error", err => {
+			console.log("IO: SOCKET ERROR");
+			if (err.type && err.type === "CONNECT_ERROR") {
+				callbacks.onConnectError.temp.forEach(cb => cb());
+				callbacks.onConnectError.persist.forEach(cb => cb());
+			}
 		});
 
 		this.ready = true;

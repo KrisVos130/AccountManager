@@ -11,7 +11,7 @@
 			:key="field.fieldId"
 			:ref="field.fieldId"
 			:fieldTypes="field.fieldTypes"/>
-			<button @click="submit()" type="button">
+			<button @click="submit()" type="button" class="button">
 				Submit
 			</button>
 	</form>
