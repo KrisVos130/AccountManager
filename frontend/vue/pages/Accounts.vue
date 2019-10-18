@@ -52,6 +52,10 @@ export default {
 					displayName: "Email(s)"
 				},
 				{
+					name: "complete",
+					displayName: "% complete"
+				},
+				{
 					name: "actions-slot",
 					displayName: "Actions"
 				}
@@ -67,10 +71,12 @@ export default {
 	computed: {
 		localData: function() {
 			return this.accounts.map(account => {
+				const completePercentage = (Object.keys(account.fields).filter(fieldName => account.fields[fieldName].length >= 1).length / Object.keys(account.fields).length) * 100;
 				return {
 					name: account.fields.name[0].name,
 					domain: account.fields.domain.map(domain => domain.domain).join(", "),
 					email: account.fields.email.map(email => email.email).join(", "),
+					complete: `${(completePercentage % 1 > 0) ? completePercentage.toFixed(2) : completePercentage}%`,
 					accountId: account._id
 				};
 			});
