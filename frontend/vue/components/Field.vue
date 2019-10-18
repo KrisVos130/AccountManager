@@ -35,7 +35,8 @@ export default {
 		return {
 			entries: [...this.initialEntries],
 			focusedInput: "",
-			activeAutosuggestHover: ""
+			activeAutosuggestHover: "",
+			autosuggestHover: ""
 		};
 	},
 	props: {

@@ -1,5 +1,5 @@
 <template>
-	<navbar>
+	<header>
 		<router-link to="/" v-slot="{ href, navigate, isExactActive }">
 			<a :class="{ 'active': isExactActive }" :href="href" @click="navigate">
 				Homepage
@@ -20,7 +20,7 @@
 				Options
 			</a>
 		</router-link>
-	</navbar>
+	</header>
 </template>
 
 <script>
@@ -41,7 +41,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-navbar {
+header {
 	display: flex;
 	width: 100%;
 	height: 60px;
