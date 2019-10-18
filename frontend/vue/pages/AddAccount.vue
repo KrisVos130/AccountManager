@@ -1,5 +1,10 @@
 <template>
-	<account-form :onSubmit="onSubmit"/>
+	<main>
+		<h1>Add account</h1>
+		<hr/>
+		<br/>
+		<account-form :onSubmit="onSubmit"/>
+	</main>
 </template>
 
 <script>
