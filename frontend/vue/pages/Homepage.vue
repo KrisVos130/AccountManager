@@ -1,14 +1,16 @@
 <template>
-	<div>
-		
-	</div>
+	<main>
+		<h1>Homepage</h1>
+	</main>
 </template>
 
 <script>
+import DataTable from '../components/DataTable.vue'
+
 import io from "../../io.js";
 
 export default {
-	components: {},
+	components: { DataTable },
 	data: () => {
 		return {
 			

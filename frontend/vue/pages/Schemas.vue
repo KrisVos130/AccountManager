@@ -1,21 +1,71 @@
 <template>
 	<main>
+		<h1>Schemas</h1>
+		<hr/>
+		<br/>
 		<input v-model="importAccountSchemaName"/>
-		<button @click="importAccountSchema()">Import account schema</button>
-
-		<router-link v-for="schema in schemas" :to="`/schemas/${schema._id}`" class="schema-item">{{ schema.name }} v{{ schema.version }}</router-link>
+		<button @click="importAccountSchema()" class="button">Import account schema</button>
+		<br/>
+		<br/>
+		<data-table ref="datatable"
+			:fields="fields"
+			:sort-order="sortOrder"
+			:data="localData"
+		>
+			<div slot="actions-slot" slot-scope="props">
+				<router-link
+					:to="`/schemas/${props.data.schemaId}`"
+					class="button"
+				>
+					View schema
+				</router-link>
+			</div>
+		</data-table>
 	</main>
 </template>
 
 <script>
 import io from "../../io.js";
 
+import DataTable from '../components/DataTable.vue';
+
 export default {
-	components: {},
+	components: { DataTable },
 	data: () => {
 		return {
 			importAccountSchemaName: "",
-			schemas: []
+			schemas: [],
+			fields: [
+				{
+					name: "name",
+					displayName: "Name"
+				},
+				{
+					name: "version",
+					displayName: "Version"
+				},
+				{
+					name: "actions-slot",
+					displayName: "Actions"
+				}
+			],
+			sortOrder: [
+				{
+					field: "version",
+					order: "desc"
+				}
+			]
+		}
+	},
+	computed: {
+		localData: function() {
+			return this.schemas.map(schema => {
+				return {
+					name: schema.name,
+					version: schema.version,
+					schemaId: schema._id
+				};
+			});
 		}
 	},
 	methods: {

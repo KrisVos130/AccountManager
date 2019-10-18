@@ -1,5 +1,8 @@
 <template>
 	<main v-if="schema">
+		<h1>View schema</h1>
+		<hr/>
+		<br/>
 		<p><b>Name</b>: {{ schema.name }}</p>
 		<p><b>Description</b>: {{ schema.description }}</p>
 		<p><b>Version</b>: v{{ schema.version }}</p>

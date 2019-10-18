@@ -22,10 +22,31 @@ export default {
 
 <style lang="scss">
 body {
-	padding: 50px;
-	margin: 0;
 	font-family: Roboto, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 	background-color: lightgray;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+main {
+	padding: 25px 50px;
+}
+
+.button {
+	padding: 8px 12px;
+	background-color: rgb(45, 150, 185);
+	color: white;
+	text-decoration: none;
+	display: inline-block;
+	box-shadow: none;
+	border: none;
+}
+
+input {
+	padding: 8px 12px;
 }
 </style>
 

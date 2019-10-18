@@ -1,5 +1,10 @@
 <template>
-	<account-form v-if="account.version" :onSubmit="onSubmit" :initialAccount="account"/>
+	<main>
+		<h1>Edit account</h1>
+		<hr/>
+		<br/>
+		<account-form v-if="account.version" :onSubmit="onSubmit" :initialAccount="account"/>
+	</main>
 </template>
 
 <script>
