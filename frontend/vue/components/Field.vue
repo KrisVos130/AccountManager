@@ -4,7 +4,7 @@
 		<button v-if="entries.length === 0" @click="addEntry()" type="button">+</button>
 		<div class="control-row" v-for="(entry, entryIndex) in entries">
 			<div class="control-col" v-for="(fieldType, fieldIndex) in fieldTypes" :class="{ 'fill-remaining': fieldType.fill }">
-				<input name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]" @change="onInputChange()" v-on:blur="blurInput(entryIndex, fieldType.fieldTypeId)" v-on:focus="focusInput(entryIndex, fieldType.fieldTypeId)" v-on:keydown="keydownInput(entryIndex, fieldType.fieldTypeId)" />
+				<input :ref="`input:${entryIndex}:${fieldType.fieldTypeId}`" name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]" @change="onInputChange()" v-on:blur="blurInput(entryIndex, fieldType.fieldTypeId)" v-on:focus="focusInput(entryIndex, fieldType.fieldTypeId)" v-on:keydown="keydownInput(entryIndex, fieldType.fieldTypeId)" @keyup.ctrl.exact.59="fillInput(entryIndex, fieldType.fieldTypeId, 'date')" @keyup.ctrl.shift.exact.59="fillInput(entryIndex, fieldType.fieldTypeId, 'time')" />
 				<select name="name" v-if="fieldType.type === 'select'" class="fill-remaining" v-model="entry[fieldType.fieldTypeId]" @change="onSelectChange()">
 					<option v-for="option in fieldType.options" :value="option.value">{{option.text}}</option>
 				</select>
@@ -95,6 +95,40 @@ export default {
 		},
 		filter(autosuggest, value) {
 			return autosuggest.filter(autosuggestItem => autosuggestItem.toLowerCase().startsWith(value.toLowerCase())).sort();
+		},
+		fillInput(entryIndex, fieldTypeId, fillType) {
+			let input = this.$refs[`input:${entryIndex}:${fieldTypeId}`][0];
+			const cursorPoint = input.selectionStart;
+			const currentValue = this.entries[entryIndex][fieldTypeId];
+
+			const firstPart = currentValue.substring(0, cursorPoint);
+			const lastPart = currentValue.substring(cursorPoint, currentValue.length);
+
+			let fillValue = "";
+			const currentDate = new Date();
+			switch(fillType) {
+				case "date":
+					const year = currentDate.getFullYear();
+					const month = `0${(currentDate.getMonth() + 1)}`.slice(-2);
+					const day = `0${currentDate.getDate()}`.slice(-2);
+					fillValue = `${year}-${month}-${day}`;
+					break;
+				case "time":
+					const hour = `0${currentDate.getHours()}`.slice(-2);
+					const minute = `0${currentDate.getMinutes()}`.slice(-2);
+					fillValue = `${hour}:${minute}`;
+					break;
+			}
+
+			const newValue = `${firstPart}${fillValue}${lastPart}`;
+
+			this.entries[entryIndex][fieldTypeId] = newValue;
+
+			const newCaretPosition = firstPart.length + fillValue.length;
+			this.$nextTick(() => {
+				input.focus();
+				input.setSelectionRange(newCaretPosition, newCaretPosition);
+			});
 		}
 	}
 };
