@@ -54,7 +54,7 @@ export default {
 		},
 		onFieldChange(fieldId) {
 			return () => {
-				this.account.fields[fieldId] = this.$refs[fieldId][0].entries;
+				this.$set(this.account.fields, fieldId, this.$refs[fieldId][0].entries);
 			};
 		}
 	},
@@ -70,8 +70,8 @@ export default {
 				this.fields = res.schema.fields;
 				this.dependencies = res.schema.dependencies;
 				if (!this.initialAccount) {
-					this.account.fields = {};
-					this.account.version = res.schema.version;
+					this.$set(this.account, "fields", {});
+					this.$set(this.account, "version", res.schema.version);
 
 					this.fields.forEach(field => {
 						let defaultObject = {};
@@ -80,7 +80,7 @@ export default {
 							else if (fieldType.type === "checkbox") defaultObject[fieldType.fieldTypeId] = false;
 						});
 						
-						this.account.fields[field.fieldId] = [];
+						this.$set(this.account.fields, field.fieldId, []);
 
 						for(let i = 0; i < field.minEntries; i++) {
 							this.account.fields[field.fieldId].push(defaultObject);
