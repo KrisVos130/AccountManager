@@ -1,18 +1,18 @@
 <template>
 	<div class="control">
 		<label for="name">{{ name }}</label>
-		<button v-if="entries.length === 0" @click="addEntry()" type="button">+</button>
+		<button v-if="entries.length === 0 && !readonly" @click="addEntry()" type="button">+</button>
 		<div class="control-row" v-for="(entry, entryIndex) in entries">
 			<div class="control-col" v-for="(fieldType, fieldIndex) in fieldTypes" :class="{ 'fill-remaining': fieldType.fill }">
-				<input :ref="`input:${entryIndex}:${fieldType.fieldTypeId}`" name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]" @change="onInputChange()" v-on:blur="blurInput(entryIndex, fieldType.fieldTypeId)" v-on:focus="focusInput(entryIndex, fieldType.fieldTypeId)" v-on:keydown="keydownInput(entryIndex, fieldType.fieldTypeId)" @keyup.ctrl.exact.59="fillInput(entryIndex, fieldType.fieldTypeId, 'date')" @keyup.ctrl.shift.exact.59="fillInput(entryIndex, fieldType.fieldTypeId, 'time')" />
-				<select name="name" v-if="fieldType.type === 'select'" class="fill-remaining" v-model="entry[fieldType.fieldTypeId]" @change="onSelectChange()">
+				<input :ref="`input:${entryIndex}:${fieldType.fieldTypeId}`" :disabled="readonly" name="name" type="text" v-if="fieldType.type === 'text'" v-model="entry[fieldType.fieldTypeId]" @change="onInputChange()" v-on:blur="blurInput(entryIndex, fieldType.fieldTypeId)" v-on:focus="focusInput(entryIndex, fieldType.fieldTypeId)" v-on:keydown="keydownInput(entryIndex, fieldType.fieldTypeId)" @keyup.ctrl.exact.59="fillInput(entryIndex, fieldType.fieldTypeId, 'date')" @keyup.ctrl.shift.exact.59="fillInput(entryIndex, fieldType.fieldTypeId, 'time')" />
+				<select name="name" v-if="fieldType.type === 'select'" :disabled="readonly" class="fill-remaining" v-model="entry[fieldType.fieldTypeId]" @change="onSelectChange()">
 					<option v-for="option in fieldType.options" :value="option.value">{{option.text}}</option>
 				</select>
-				<div tabindex="0" v-on:keyup.enter="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" v-on:keyup.space="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" name="name" class="checkbox" v-if="fieldType.type === 'checkbox'" :class="{ checked: entry[fieldType.fieldTypeId] }" @click="toggleCheckbox(entryIndex, fieldType.fieldTypeId)"></div>
+				<div tabindex="0" v-on:keyup.enter="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" v-on:keyup.space="toggleCheckbox(entryIndex, fieldType.fieldTypeId)" name="name" class="checkbox" v-if="fieldType.type === 'checkbox'" :class="{ checked: entry[fieldType.fieldTypeId], disabled: readonly }" @click="toggleCheckbox(entryIndex, fieldType.fieldTypeId)"></div>
 
-				<button v-if="fieldType.extraButtons" v-for="buttonInfo in fieldType.extraButtons" type="button" :class="[buttonInfo.style]">{{buttonInfo.icon}}</button>
-				<button v-if="entryIndex + 1 === entries.length && entryIndex + 1 < maxEntries && fieldIndex + 1 === fieldTypes.length" @click="addEntry()" type="button">+</button>
-				<button v-if="entries.length > minEntries && fieldIndex + 1 === fieldTypes.length" @click="removeEntry(entryIndex)" type="button">-</button>
+				<button v-if="fieldType.extraButtons && !readonly" v-for="buttonInfo in fieldType.extraButtons" type="button" :class="[buttonInfo.style]">{{buttonInfo.icon}}</button>
+				<button v-if="entryIndex + 1 === entries.length && entryIndex + 1 < maxEntries && fieldIndex + 1 === fieldTypes.length && !readonly" @click="addEntry()" type="button">+</button>
+				<button v-if="entries.length > minEntries && fieldIndex + 1 === fieldTypes.length && !readonly" @click="removeEntry(entryIndex)" type="button">-</button>
 
 				<div v-if="fieldType.autosuggestGroup && (focusedInput === `${entryIndex}.${fieldType.fieldTypeId}` || autosuggestHover === `${entryIndex}.${fieldType.fieldTypeId}`)" class="autosuggest-container" @mouseover="focusAutosuggestContainer(entryIndex, fieldType.fieldTypeId)" @mouseleave="blurAutosuggestContainer()">
 					<div v-for="autosuggestItem in filter(autosuggest[fieldType.autosuggestGroup], entry[fieldType.fieldTypeId])" class="autosuggest-item" @click="selectAutosuggest(entryIndex, fieldType.fieldTypeId, autosuggestItem)">
@@ -46,7 +46,8 @@ export default {
 		maxEntries: Number,
 		initialEntries: Array,
 		autosuggest: Object,
-		onChange: Function
+		onChange: Function,
+		readonly: Boolean
 	},
 	mounted() {
 		
@@ -66,6 +67,7 @@ export default {
 			this.onChange();
 		},
 		toggleCheckbox(entryIndex, fieldTypeId) {
+			if (this.readonly) return;
 			this.entries[entryIndex][fieldTypeId] = !this.entries[entryIndex][fieldTypeId];
 			this.onChange();
 		},
@@ -229,6 +231,10 @@ export default {
 	cursor: pointer;
 	position: relative;
 	box-sizing: border-box;
+
+	&.disabled {
+		cursor:auto;
+	}
 }
 
 .checkbox.checked::after {

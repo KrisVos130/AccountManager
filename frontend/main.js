@@ -28,6 +28,14 @@ const router = new VueRouter({
 			component: () => import("./vue/pages/Schemas.vue")
 		},
 		{
+			path: "/convert",
+			component: () => import("./vue/pages/ConvertAccounts.vue")
+		},
+		{
+			path: "/convert/:accountId",
+			component: () => import("./vue/pages/ConvertAccount.vue")
+		},
+		{
 			path: "/options",
 			component: () => import("./vue/pages/Options.vue")
 		},

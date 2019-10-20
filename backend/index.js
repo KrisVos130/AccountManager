@@ -164,6 +164,7 @@ moduleManager.addModule("util");
 moduleManager.addModule("mongo");
 moduleManager.addModule("account");
 moduleManager.addModule("accountSchema");
+moduleManager.addModule("convertSchema");
 
 moduleManager.initialize();
 

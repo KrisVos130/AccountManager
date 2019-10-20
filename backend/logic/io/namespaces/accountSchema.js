@@ -17,6 +17,32 @@ module.exports = {
 		});
 	},
 
+	"getByVersion": (cb, version) => {
+		accountSchemaModule.getByVersion(version).then(schema => {
+			cb({
+				status: "success",
+				schema
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
+			});
+		});
+	},
+
+	"getAllVersions": (cb) => {
+		accountSchemaModule.getAllVersions().then(versions => {
+			cb({
+				status: "success",
+				versions
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
+			});
+		});
+	},
+
 	"getAll": cb => {
 		accountSchemaModule.getAll().then(schemas => {
 			cb({

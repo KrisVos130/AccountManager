@@ -25,7 +25,7 @@ module.exports = class extends coreClass {
 			this.accountSchemaModel = await this.mongoModule.model("accountSchema");
 			this.accountModel = await this.mongoModule.model("account");
 
-			async.waterfall([
+			/*async.waterfall([
 				(next) => {
 					this.accountSchemaModel.find({}, null, { sort: "-version", limit: 1 }, next);
 				},
@@ -61,7 +61,9 @@ module.exports = class extends coreClass {
 			], (err) => {
 				if (err) reject(new Error(err));
 				else resolve();
-			});
+			});*/
+
+			resolve();
 		})
 	}
 

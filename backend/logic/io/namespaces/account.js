@@ -31,6 +31,20 @@ module.exports = {
 		});
 	},
 
+	"getMigratedAccount": (cb, accountId) => {
+		accountModule.getMigratedAccount(accountId).then(account => {
+			cb({
+				status: "success",
+				account
+			});
+		}).catch(err => {
+			cb({
+				status: "failure",
+				message: err.message
+			});
+		});
+	},
+
 	"add": (cb, account) => {
 		accountModule.add(account).then(() => {
 			console.log("Added account!");

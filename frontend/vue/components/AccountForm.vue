@@ -12,8 +12,9 @@
 			:key="field.fieldId"
 			:ref="field.fieldId"
 			:onChange="onFieldChange(field.fieldId)"
+			:readonly="readonly"
 			:fieldTypes="field.fieldTypes"/>
-			<button @click="submit()" type="button" class="button">
+			<button @click="submit()" type="button" class="button" v-if="!readonly">
 				Submit
 			</button>
 	</form>
@@ -30,6 +31,7 @@ export default {
 		return {
 			fields: [],
 			account: {},
+			schema: {},
 			autosuggest: {},
 			dependencies: {}
 		};
@@ -50,49 +52,68 @@ export default {
 			let dependencyFieldId = dependency.fieldId;
 			if (!this.dependencyChecksOut(dependencyFieldId)) return false;
 			let dependencyEval = dependency.eval.replace("{fields}", "this.account.fields");
-			return eval(dependencyEval);
+			/*try {
+				return eval(dependencyEval);
+			} catch(err) {
+				console.log("Eval error", err);
+				return false;
+			}*/
+			return false;
 		},
 		onFieldChange(fieldId) {
 			return () => {
 				this.$set(this.account.fields, fieldId, this.$refs[fieldId][0].entries);
 			};
+		},
+		initializeAccount() {
+			if (!this.initialAccount) {
+				this.$set(this.account, "fields", {});
+				this.$set(this.account, "version", this.schema.version);
+
+				this.fields.forEach(field => {
+					let defaultObject = {};
+					field.fieldTypes.forEach(fieldType => {
+						if (fieldType.type === "text" || fieldType.type === "select") defaultObject[fieldType.fieldTypeId] = "";
+						else if (fieldType.type === "checkbox") defaultObject[fieldType.fieldTypeId] = false;
+					});
+					
+					this.$set(this.account.fields, field.fieldId, []);
+
+					for(let i = 0; i < field.minEntries; i++) {
+						this.account.fields[field.fieldId].push(defaultObject);
+					}
+				});
+
+				this.templateAccount = this.account;
+			} else {
+				this.account = this.initialAccount;
+				this.templateAccount = this.initialAccount;
+			}
 		}
 	},
 	props: {
 		onSubmit: Function,
-		initialAccount: Object
+		initialAccount: Object,
+		readonly: Boolean
 	},
 	mounted() {
 		io.getSocket(socket => {
 			this.socket = socket;
 
-			socket.emit("accountSchema.getLatest", res => {
-				this.fields = res.schema.fields;
-				this.dependencies = res.schema.dependencies;
-				if (!this.initialAccount) {
-					this.$set(this.account, "fields", {});
-					this.$set(this.account, "version", res.schema.version);
-
-					this.fields.forEach(field => {
-						let defaultObject = {};
-						field.fieldTypes.forEach(fieldType => {
-							if (fieldType.type === "text" || fieldType.type === "select") defaultObject[fieldType.fieldTypeId] = "";
-							else if (fieldType.type === "checkbox") defaultObject[fieldType.fieldTypeId] = false;
-						});
-						
-						this.$set(this.account.fields, field.fieldId, []);
-
-						for(let i = 0; i < field.minEntries; i++) {
-							this.account.fields[field.fieldId].push(defaultObject);
-						}
-					});
-
-					this.templateAccount = this.account;
-				} else {
-					this.account = this.initialAccount;
-					this.templateAccount = this.initialAccount;
-				}
-			});
+			if (this.initialAccount) {
+				socket.emit("accountSchema.getByVersion", this.initialAccount.version, res => {
+					this.fields = res.schema.fields;
+					this.dependencies = (res.schema.dependencies) ? res.schema.dependencies : {};
+					this.initializeAccount();
+				});
+			} else {
+				socket.emit("accountSchema.getLatest", res => {
+					this.fields = res.schema.fields;
+					this.schema = res.schema;
+					this.dependencies = (res.schema.dependencies) ? res.schema.dependencies : {};
+					this.initializeAccount();
+				});
+			}
 
 			socket.emit("util.getAutosuggest", res => {
 				this.autosuggest = res.autosuggest;

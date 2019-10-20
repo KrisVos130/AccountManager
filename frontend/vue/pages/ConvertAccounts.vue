@@ -3,12 +3,8 @@
 		<h1>Accounts</h1>
 		<hr/>
 		<br/>
-		<router-link
-			to="/accounts/add"
-			class="button"
-		>
-			Add account
-		</router-link>
+		<input v-model="importConvertSchemaName"/>
+		<button @click="importConvertSchema()" class="button">Import convert schema</button>
 		<br/>
 		<br/>
 		<data-table ref="datatable"
@@ -18,10 +14,10 @@
 		>
 			<div slot="actions-slot" slot-scope="props">
 				<router-link
-					:to="`/accounts/edit/${props.data.accountId}`"
+					:to="`/convert/${props.data.accountId}`"
 					class="button"
 				>
-					Edit account
+					Convert account
 				</router-link>
 			</div>
 		</data-table>
@@ -44,16 +40,8 @@ export default {
 					displayName: "Name"
 				},
 				{
-					name: "domain",
-					displayName: "Domain(s)"
-				},
-				{
-					name: "email",
-					displayName: "Email(s)"
-				},
-				{
-					name: "complete",
-					displayName: "% complete"
+					name: "version",
+					displayName: "Version"
 				},
 				{
 					name: "actions-slot",
@@ -63,32 +51,34 @@ export default {
 			sortOrder: [
 				{
 					field: "name",
+					order: "desc"
+				},
+				{
+					field: "version",
 					order: "asc"
 				}
-			]
+			],
+			importConvertSchemaName: ""
 		}
 	},
 	computed: {
 		localData: function() {
 			return this.accounts.map(account => {
-				const completePercentage = (Object.keys(account.fields).filter(fieldName => account.fields[fieldName].length >= 1).length / Object.keys(account.fields).length) * 100;
-				let email = "";
-
-				if (account.version === 6) email = account.fields.newemail.map(newemail => newemail.newemail).join(", ");
-				else account.fields.email.map(email => email.email).join(", ");
-
 				return {
 					name: account.fields.name[0].name,
-					domain: account.fields.domain.map(domain => domain.domain).join(", "),
-					email,
-					complete: `${(completePercentage % 1 > 0) ? completePercentage.toFixed(2) : completePercentage}%`,
+					version: account.version,
 					accountId: account._id
 				};
 			});
 		}
 	},
 	methods: {
-		
+		importConvertSchema() {
+			this.socket.emit("convertSchema.import", this.importConvertSchemaName, (res) => {
+				console.log(res);
+				alert(res.status);
+			});
+		}
 	},
 	mounted() {
 		io.getSocket(socket => {

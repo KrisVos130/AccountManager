@@ -27,11 +27,13 @@ module.exports = class extends coreClass {
 			})
 				.then(() => {
 					this._schemas = {
+						convertSchema: new mongoose.Schema(require(`./schemas/convertSchema`)),
 						accountSchema: new mongoose.Schema(require(`./schemas/accountSchema`)),
 						account: new mongoose.Schema(require(`./schemas/account`))
 					};
 		
 					this._models = {
+						convertSchema: mongoose.model('convertSchema', this._schemas.convertSchema),
 						accountSchema: mongoose.model('accountSchema', this._schemas.accountSchema),
 						account: mongoose.model('account', this._schemas.account)
 					};

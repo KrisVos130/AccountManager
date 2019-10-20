@@ -19,6 +19,8 @@ module.exports = class extends coreClass {
 
 			this.mongoModule = this.moduleManager.modules["mongo"];
 			this.utilModule = this.moduleManager.modules["util"];
+			this.accountSchemaModule = this.moduleManager.modules["accountSchema"];
+			this.convertSchemaModule = this.moduleManager.modules["convertSchema"];
 
 			this.accountSchema = await this.mongoModule.schema("account");
 			this.accountModel = await this.mongoModule.model("account");
@@ -67,13 +69,110 @@ module.exports = class extends coreClass {
 		return new Promise(async (resolve, reject) => {
 			try { await this._validateHook(); } catch { return; }
 
-			this.accountModel.updateOne({ _id: accountId }, account, (err) => {
+			if (!accountId || !account) return reject(new Error("Account ID or Account invalid."));
+
+			this.accountModel.updateOne({ _id: accountId }, account, (err, res) => {
 				if (err) reject(new Error(err));
 				else {
 					this.utilModule.addAutosuggestAccount(account);
 					resolve();
 				}
 			});
+		});
+	}
+
+	async getMigratedAccount(accountId) {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+			if (!accountId) return reject(new Error("Account ID invalid."));
+
+			let oldAccount = await this.getById(accountId);
+
+			const latestVersion = (await this.accountSchemaModule.getLatest()).version;
+			if (oldAccount.version === latestVersion) return reject(new Error("Account is already up-to-date"));
+
+			let convertSchema;
+			try {
+				convertSchema = await this.convertSchemaModule.getForVersion(oldAccount.version);
+			} catch(err) {
+				reject(err);
+			}
+
+			let oldSchema = await this.accountSchemaModule.getByVersion(convertSchema.versionFrom);
+			let newSchema = await this.accountSchemaModule.getByVersion(convertSchema.versionTo);
+			
+			let defaultNewObjects = {};
+			let newAccount = {
+				fields: {},
+				version: convertSchema.versionTo
+			};
+
+			newSchema.fields.forEach(newField => {
+				const oldField = oldSchema.fields.find(oldField => oldField.fieldId === newField.fieldId);
+				let defaultNewObject = {};
+				newField.fieldTypes.forEach(newFieldType => {
+					if (newFieldType.type === "text" || newFieldType.type === "select") defaultNewObject[newFieldType.fieldTypeId] = "";
+					else if (newFieldType.type === "checkbox") defaultNewObject[newFieldType.fieldTypeId] = false;
+				});
+				defaultNewObjects[newField.fieldId] = defaultNewObject;
+
+				newAccount.fields[newField.fieldId] = [];
+
+				
+				if (oldField) {
+					let entries = [];
+
+					oldAccount.fields[oldField.fieldId].forEach(oldAccountFieldEntry => {
+						entries.push({});
+					});
+					 
+					newField.fieldTypes.forEach(newFieldType => {
+						const oldFieldType = oldField.fieldTypes.find(oldFieldType => oldFieldType.fieldTypeId === newFieldType.fieldTypeId);
+						if (oldFieldType) {
+							oldAccount.fields[oldField.fieldId].forEach((oldAccountFieldEntry, index) => {
+								entries[index][newFieldType.fieldTypeId] = oldAccountFieldEntry[newFieldType.fieldTypeId];
+							});
+						} else {
+							entries = entries.map(entry => {
+								entry[newFieldType.fieldTypeId] = defaultNewObject[newFieldType.fieldTypeId];
+								return entry;
+							});
+						}
+					});
+
+					newAccount.fields[newField.fieldId] = entries;
+				}
+			});
+
+			Object.keys(convertSchema.changes).forEach(changeOld => {
+				const oldFieldId = changeOld.split("+")[0];
+				const oldFieldTypeId = changeOld.split("+")[1];
+				const changeNew = convertSchema.changes[changeOld];
+				const newFieldId = changeNew.split("+")[0];
+				const newFieldTypeId = changeNew.split("+")[1];
+				
+				const oldField = oldAccount.fields[oldFieldId];
+				const newField = newAccount.fields[newFieldId];
+				
+				const entriesToAdd = oldField.length - newField.length;
+				for(let i = 0; i < entriesToAdd; i++) {
+					newAccount.fields[newFieldId].push(JSON.parse(JSON.stringify(defaultNewObjects[newFieldId])));
+				}
+
+				for(let i = 0; i < newField.length; i++) {
+					newAccount.fields[newFieldId][i][newFieldTypeId] = oldAccount.fields[oldFieldId][i][oldFieldTypeId];
+				}
+			});
+
+			newSchema.fields.forEach(newField => {
+				const entriesToAdd = newField.minEntries - newAccount.fields[newField.fieldId];
+
+				for(let i = 0; i < entriesToAdd; i++) {
+					newAccount.fields[newField.fieldId].push(JSON.parse(JSON.stringify(defaultNewObjects[newField.fieldId])));
+				}
+			});
+
+			resolve(newAccount);
 		});
 	}
 }
