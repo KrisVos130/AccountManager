@@ -96,6 +96,7 @@ module.exports = class extends coreClass {
 
 			let convertSchema;
 			try { convertSchema = await this.convertSchemaModule.getForVersion(oldAccount.version); } catch(err) { reject(err); }
+			if (!convertSchema.changes) convertSchema.changes = {};
 
 			let oldSchema;
 			try { oldSchema = await this.accountSchemaModule.getByVersion(convertSchema.versionFrom); } catch  { return reject("Couldn't get from schema."); }
