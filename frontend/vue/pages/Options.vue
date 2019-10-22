@@ -5,7 +5,7 @@
 		<br/>
 		<div class="control">
 			<label for="passcode">Passcode: </label>
-			<input type="text" id="passcode" v-model="passcode"/>
+			<input type="password" id="passcode" v-model="passcode"/>
 		</div>
 		<button class="button" @click="save()">Save</button>
 	</main>
