@@ -72,15 +72,11 @@ export default {
 		localData: function() {
 			return this.accounts.map(account => {
 				const completePercentage = (Object.keys(account.fields).filter(fieldName => account.fields[fieldName].length >= 1).length / Object.keys(account.fields).length) * 100;
-				let email = "";
-
-				if (account.version === 6) email = account.fields.newemail.map(newemail => newemail.newemail).join(", ");
-				else account.fields.email.map(email => email.email).join(", ");
 
 				return {
 					name: account.fields.name[0].name,
 					domain: account.fields.domain.map(domain => domain.domain).join(", "),
-					email,
+					email: account.fields.email.map(email => email.email).join(", "),
 					complete: `${(completePercentage % 1 > 0) ? completePercentage.toFixed(2) : completePercentage}%`,
 					accountId: account._id
 				};
