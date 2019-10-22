@@ -12,6 +12,8 @@
 </template>
 
 <script>
+import io from "../../io.js";
+
 export default {
 	components: {  },
 	data: () => {
@@ -25,9 +27,15 @@ export default {
 	methods: {
 		save() {
 			localStorage.setItem("passcode", this.passcode);
+			this.socket.disconnect();
+			this.socket.io.opts.query = `passcode=${this.passcode}`;
+			this.socket.connect();
 		}
 	},
 	mounted() {
+		io.getSocket(socket => {
+			this.socket = socket;
+		});
 		this.passcode = localStorage.getItem("passcode");
 	}
 };
