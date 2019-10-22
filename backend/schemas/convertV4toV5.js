@@ -1,6 +1,6 @@
 module.exports = {
-	versionFrom: 5,
-	versionTo: 6,
+	versionFrom: 4,
+	versionTo: 5,
 	changes: {
 		"app+appType": "newapp+newappType",
 		"app+appName": "newapp+newappName",
