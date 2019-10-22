@@ -45,6 +45,21 @@ module.exports = {
 		});
 	},
 
+	"migrateAccounts": (cb, accountIds) => {
+		accountModule.migrateAccounts(accountIds).then(res => {
+			cb({
+				status: "success",
+				failed: res.failed,
+				successful: res.successful
+			});
+		}).catch(err => {
+			cb({
+				status: "failure",
+				message: err.message
+			});
+		});
+	},
+
 	"add": (cb, account) => {
 		accountModule.add(account).then(() => {
 			console.log("Added account!");

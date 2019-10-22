@@ -86,20 +86,21 @@ module.exports = class extends coreClass {
 			try { await this._validateHook(); } catch { return; }
 			if (!accountId) return reject(new Error("Account ID invalid."));
 
-			let oldAccount = await this.getById(accountId);
+			let oldAccount;
+			try { oldAccount = await this.getById(accountId); } catch { return reject("Couldn't get account."); }
 
-			const latestVersion = (await this.accountSchemaModule.getLatest()).version;
+			let latestVersion;
+			try { latestVersion = (await this.accountSchemaModule.getLatest()).version; } catch { return reject("Couldn't get latest schema.");  }
+
 			if (oldAccount.version === latestVersion) return reject(new Error("Account is already up-to-date"));
 
 			let convertSchema;
-			try {
-				convertSchema = await this.convertSchemaModule.getForVersion(oldAccount.version);
-			} catch(err) {
-				reject(err);
-			}
+			try { convertSchema = await this.convertSchemaModule.getForVersion(oldAccount.version); } catch(err) { reject(err); }
 
-			let oldSchema = await this.accountSchemaModule.getByVersion(convertSchema.versionFrom);
-			let newSchema = await this.accountSchemaModule.getByVersion(convertSchema.versionTo);
+			let oldSchema;
+			try { oldSchema = await this.accountSchemaModule.getByVersion(convertSchema.versionFrom); } catch  { return reject("Couldn't get from schema."); }
+			let newSchema;
+			try { newSchema = await this.accountSchemaModule.getByVersion(convertSchema.versionTo) } catch { return reject("Couldn't get new schema"); }
 			
 			let defaultNewObjects = {};
 			let newAccount = {
@@ -173,6 +174,45 @@ module.exports = class extends coreClass {
 			});
 
 			resolve(newAccount);
+		});
+	}
+
+	async migrateAccounts(accountIds) {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			let successful = 0;
+			let failed = 0;
+
+			async.eachLimit(
+				accountIds,
+				10,
+				(accountId, next) => {
+					this.getMigratedAccount(accountId).then(account => {
+						if (!account) {
+							failed++;
+							return next();
+						}
+
+						this.editById(accountId, account).then(() => {
+							successful++;
+							return next();
+						}).catch(err => {
+							failed++;
+							return next();
+						});
+					}).catch(err => {
+						failed++;
+						return next();
+					});
+				},
+				(err) => {
+					resolve({
+						successful,
+						failed
+					});
+				}
+			);
 		});
 	}
 }

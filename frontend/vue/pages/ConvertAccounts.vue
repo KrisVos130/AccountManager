@@ -12,6 +12,9 @@
 			:sort-order="sortOrder"
 			:data="localData"
 		>
+			<div slot="select-slot" slot-scope="props">
+				<div tabindex="0" name="name" class="checkbox" @click="toggleCheckbox(props.data.accountId)" v-on:keyup.enter="toggleCheckbox(props.data.accountId)" v-on:keyup.space="toggleCheckbox(props.data.accountId)" :class="{ checked: selectedAccounts.indexOf(props.data.accountId) !== -1 }"></div>
+			</div>
 			<div slot="actions-slot" slot-scope="props">
 				<router-link
 					:to="`/convert/${props.data.accountId}`"
@@ -21,6 +24,9 @@
 				</router-link>
 			</div>
 		</data-table>
+		<br/>
+		<br/>
+		<button @click="convertAccounts()" v-if="!convertingAccounts" class="button">Migrate accounts</button>
 	</main>
 </template>
 
@@ -34,7 +40,13 @@ export default {
 	data: () => {
 		return {
 			accounts: [],
+			selectedAccounts: [],
+			convertingAccounts: false,
 			fields: [
+				{
+					name: "select-slot",
+					displayName: ""
+				},
 				{
 					name: "name",
 					displayName: "Name"
@@ -78,6 +90,19 @@ export default {
 				console.log(res);
 				alert(res.status);
 			});
+		},
+		convertAccounts() {
+			this.convertingAccounts = true;
+			this.socket.emit("account.migrateAccounts", this.selectedAccounts, (res) => {
+				console.log(res);
+				alert(`Migrated accounts. Successful: ${res.successful}; failed: ${res.failed}`);
+				location.reload();
+			});
+		},
+		toggleCheckbox(accountId) {
+			const selectedAccountIndex = this.selectedAccounts.indexOf(accountId);
+			if (selectedAccountIndex === -1) this.selectedAccounts.push(accountId);
+			else this.selectedAccounts.splice(selectedAccountIndex, 1);
 		}
 	},
 	mounted() {
@@ -94,5 +119,30 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.checkbox {
+	height: 32px;
+	width: 32px;
+	background-color: white;
+	border: .5px #464646 solid;
+	border-radius: 3px;
+	cursor: pointer;
+	position: relative;
+	box-sizing: border-box;
 
+	&.disabled {
+		cursor:auto;
+	}
+}
+
+.checkbox.checked::after {
+	content: "";
+	width: 26px;
+	height: 26px;
+	left: 2px;
+	top: 2px;
+	display: inline-block;
+	position: absolute;
+	border-radius: 3px;
+	background-color: #69B862;
+}
 </style>
