@@ -1,3 +1,6 @@
+process.env.NODE_CONFIG_DIR = `${__dirname}/dist/config/`;
+const config = require("config");
+
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const WebpackMd5Hash = require("webpack-md5-hash");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -50,8 +53,8 @@ module.exports = {
 		contentBase: "./dist/",
 		historyApiFallback: true,
 		hot: true,
-		port: 80,
-		public: "http://localhost",
+		port: config.get("frontendPort"),
+		public: config.get("frontendDomain"),
 		watchOptions: {
 			aggregateTimeout: 300,
 			poll: 1000

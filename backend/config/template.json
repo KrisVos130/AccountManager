@@ -1,7 +1,8 @@
 {
+	"backendPort": 8080,
 	"fancyConsole": true,
 	"mongo": {
-		"url": ""
+		"url": "mongodb://USER:PASSWORD@localhost:27017/DATABASE"
 	},
 	"passcode": "Secret"
 }
