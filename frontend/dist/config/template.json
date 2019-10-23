@@ -1,3 +1,5 @@
 {
+	"frontendPort": 80,
+	"frontendDomain": "http://localhost",
 	"backendUrl": "http://localhost:8080"
 }

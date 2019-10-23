@@ -64,8 +64,8 @@ module.exports = class extends coreClass {
 				});
 			});
 
-			server.listen(8080, function(){
-				console.log('listening on *:8080');
+			server.listen(config.get("backendPort"), function(){
+				console.log('listening on *:' + config.get("backendPort"));
 
 				resolve();
 			});
