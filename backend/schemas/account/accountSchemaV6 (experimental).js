@@ -1,7 +1,7 @@
 module.exports = {
 	name: "Account",
 	description: "Account schema",
-	version: 5,
+	version: 6,
 	fields: [
 		{
 			name: "Name",
@@ -94,7 +94,8 @@ module.exports = {
 				{
 					type: "text",
 					fieldTypeId: "username",
-					fill: true
+					fill: true,
+					autosuggestGroup: "username"
 				}
 			],
 			minEntries: 0,
@@ -404,6 +405,18 @@ module.exports = {
 		}
 	],
 	dependencies: {
+		"passwordLastChanged": {
+			eval: "{fields}.usesPassword.length > 0",
+			fieldId: "usesPassword"
+		},
+		"requestedDeletionAt": {
+			eval: "{fields}.requestedDeletion.length > 0",
+			fieldId: "requestedDeletion"
+		},
+		"deletedAt": {
+			eval: "{fields}.deleted.length > 0",
+			fieldId: "deleted"
+		},
 		"twofaUsed": {
 			eval: "{fields}.twofaPossible.length > 0",
 			fieldId: "twofaPossible"
