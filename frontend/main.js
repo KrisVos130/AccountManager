@@ -36,12 +36,16 @@ const router = new VueRouter({
 			component: () => import("./vue/pages/ConvertAccount.vue")
 		},
 		{
+			path: "/convert/view/:schemaId",
+			component: () => import("./vue/pages/ViewConvertSchema.vue")
+		},
+		{
 			path: "/options",
 			component: () => import("./vue/pages/Options.vue")
 		},
 		{
 			path: "/schemas/:schemaId",
-			component: () => import("./vue/pages/ViewSchema.vue")
+			component: () => import("./vue/pages/ViewAccountSchema.vue")
 		},
 		{
 			path: "/accounts/add",

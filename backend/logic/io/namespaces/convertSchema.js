@@ -17,6 +17,44 @@ module.exports = {
 		});
 	},
 
+	"getById": (cb, schemaId) => {
+		convertSchemaModule.getById(schemaId).then(schema => {
+			cb({
+				status: "success",
+				schema
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
+			});
+		});
+	},
+
+	"removeById": (cb, schemaId) => {
+		convertSchemaModule.removeById(schemaId).then(() => {
+			cb({
+				status: "success"
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
+			});
+		});
+	},
+
+	"getAll": (cb) => {
+		convertSchemaModule.getAll().then(schemas => {
+			cb({
+				status: "success",
+				schemas
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
+			});
+		});
+	},
+
 	"import": (cb, name) => {
 		convertSchemaModule.import(name).then(() => {
 			cb({

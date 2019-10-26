@@ -31,6 +31,9 @@
 				
 			</div>
 		</div>
+		<br/>
+		<br/>
+		<button class="button" @click="removeSchema()">Remove schema</button>
 	</main>
 </template>
 
@@ -47,7 +50,12 @@ export default {
 	props: {
 	},
 	methods: {
-		
+		removeSchema() {
+			this.socket.emit("accountSchema.removeById", this.schemaId, (res) => {
+				alert(res.status);
+				this.$router.push("/schemas");
+			});
+		}
 	},
 	mounted() {
 		this.schemaId = this.$route.params.schemaId;

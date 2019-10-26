@@ -69,6 +69,18 @@ module.exports = {
 		});
 	},
 
+	"removeById": (cb, schemaId) => {
+		accountSchemaModule.removeById(schemaId).then(() => {
+			cb({
+				status: "success"
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
+			});
+		});
+	},
+
 	"import": (cb, name) => {
 		accountSchemaModule.import(name).then(() => {
 			cb({

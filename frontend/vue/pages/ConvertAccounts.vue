@@ -1,20 +1,16 @@
 <template>
 	<main>
-		<h1>Accounts</h1>
+		<h1>Convert accounts</h1>
 		<hr/>
-		<br/>
-		<input v-model="importConvertSchemaName"/>
-		<button @click="importConvertSchema()" class="button">Import convert schema</button>
-		<br/>
 		<br/>
 		<p>Select/deselect all:</p>
 		<button class="button" v-for="version in versions" @click="toggleVersion(version)">{{version}}</button>
 		<br/>
 		<br/>
-		<data-table ref="datatable"
-			:fields="fields"
-			:sort-order="sortOrder"
-			:data="localData"
+		<data-table ref="accounts-datatable"
+			:fields="accountsFields"
+			:sort-order="accountsSortOrder"
+			:data="accountsLocalData"
 		>
 			<div slot="select-slot" slot-scope="props">
 				<div tabindex="0" name="name" class="checkbox" @click="toggleCheckbox(props.data.accountId)" v-on:keyup.enter="toggleCheckbox(props.data.accountId)" v-on:keyup.space="toggleCheckbox(props.data.accountId)" :class="{ checked: selectedAccounts.indexOf(props.data.accountId) !== -1 }"></div>
@@ -29,8 +25,30 @@
 			</div>
 		</data-table>
 		<br/>
-		<br/>
 		<button @click="convertAccounts()" v-if="!convertingAccounts" class="button">Migrate accounts</button>
+		<br/>
+		<br/>
+		<h1>Convert schemas</h1>
+		<hr/>
+		<br/>
+		<input v-model="importConvertSchemaName"/>
+		<button @click="importConvertSchema()" class="button">Import convert schema</button>
+		<br/>
+		<br/>
+		<data-table ref="convert-schema-datatable"
+			:fields="convertSchemasFields"
+			:sort-order="convertSchemasSortOrder"
+			:data="convertSchemasLocalData"
+		>
+			<div slot="actions-slot" slot-scope="props">
+				<router-link
+					:to="`/convert/view/${props.data.schemaId}`"
+					class="button"
+				>
+					View convert schema
+				</router-link>
+			</div>
+		</data-table>
 	</main>
 </template>
 
@@ -44,10 +62,11 @@ export default {
 	data: () => {
 		return {
 			accounts: [],
+			convertSchemas: [],
 			versions: [],
 			selectedAccounts: [],
 			convertingAccounts: false,
-			fields: [
+			accountsFields: [
 				{
 					name: "select-slot",
 					displayName: ""
@@ -65,7 +84,7 @@ export default {
 					displayName: "Actions"
 				}
 			],
-			sortOrder: [
+			accountsSortOrder: [
 				{
 					field: "name",
 					order: "desc"
@@ -75,16 +94,49 @@ export default {
 					order: "asc"
 				}
 			],
+			convertSchemasFields: [
+				{
+					name: "versionFrom",
+					displayName: "Version from"
+				},
+				{
+					name: "versionTo",
+					displayName: "Version to"
+				},
+				{
+					name: "actions-slot",
+					displayName: "Actions"
+				}
+			],
+			convertSchemasSortOrder: [
+				{
+					field: "versionFrom",
+					order: "asc"
+				},
+				{
+					field: "versionTo",
+					order: "asc"
+				}
+			],
 			importConvertSchemaName: ""
 		}
 	},
 	computed: {
-		localData: function() {
+		accountsLocalData: function() {
 			return this.accounts.map(account => {
 				return {
 					name: account.fields.name[0].name,
 					version: account.version,
 					accountId: account._id
+				};
+			});
+		},
+		convertSchemasLocalData: function() {
+			return this.convertSchemas.map(schema => {
+				return {
+					versionFrom: schema.versionFrom,
+					versionTo: schema.versionTo,
+					schemaId: schema._id
 				};
 			});
 		}
@@ -140,6 +192,10 @@ export default {
 
 			socket.emit("accountSchema.getAllVersions", res => {
 				this.versions = res.versions;
+			});
+
+			socket.emit("convertSchema.getAll", res => {
+				this.convertSchemas = res.schemas;
 			});
 		});
 	}

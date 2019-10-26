@@ -38,6 +38,40 @@ module.exports = class extends coreClass {
 		});
 	}
 
+	async getById(schemaId) {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			this.convertSchemaModel.findById(schemaId, (err, schema) => {
+				if (err || !schema) reject(new Error("Something went wrong."))
+				else resolve(schema)
+			});
+		});
+	}
+
+	async removeById(schemaId) {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			this.convertSchemaModel.deleteOne({ _id: schemaId }, (err, res) => {
+				if (err) reject(new Error("Something went wrong."));
+				else if (res.deletedCount !== 1) reject(new Error("Nothing was removed."));
+				else resolve();
+			});
+		});
+	}
+
+	async getAll() {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			this.convertSchemaModel.find({ }, (err, schemas) => {
+				if (err) reject(new Error(err.message));
+				else resolve(schemas)
+			});
+		});
+	}
+
 	async import(name) {
 		return new Promise(async (resolve, reject) => {
 			try { await this._validateHook(); } catch { return; }

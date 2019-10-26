@@ -70,6 +70,18 @@ module.exports = class extends coreClass {
 		});
 	}
 
+	async removeById(schemaId) {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			this.accountSchemaModel.deleteOne({ _id: schemaId }, (err, res) => {
+				if (err) reject(new Error("Something went wrong."));
+				else if (res.deletedCount !== 1) reject(new Error("Nothing was removed."));
+				else resolve();
+			});
+		});
+	}
+
 	async getByVersion(version) {
 		return new Promise(async (resolve, reject) => {
 			try { await this._validateHook(); } catch { return; }
