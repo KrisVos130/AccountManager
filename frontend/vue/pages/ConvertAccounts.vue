@@ -7,6 +7,10 @@
 		<button @click="importConvertSchema()" class="button">Import convert schema</button>
 		<br/>
 		<br/>
+		<p>Select/deselect all:</p>
+		<button class="button" v-for="version in versions" @click="toggleVersion(version)">{{version}}</button>
+		<br/>
+		<br/>
 		<data-table ref="datatable"
 			:fields="fields"
 			:sort-order="sortOrder"
@@ -40,6 +44,7 @@ export default {
 	data: () => {
 		return {
 			accounts: [],
+			versions: [],
 			selectedAccounts: [],
 			convertingAccounts: false,
 			fields: [
@@ -103,6 +108,25 @@ export default {
 			const selectedAccountIndex = this.selectedAccounts.indexOf(accountId);
 			if (selectedAccountIndex === -1) this.selectedAccounts.push(accountId);
 			else this.selectedAccounts.splice(selectedAccountIndex, 1);
+		},
+		toggleVersion(version) {
+			let allAccountsChecked = true;
+			this.accounts.forEach(account => {
+				if (account.version === version && this.selectedAccounts.indexOf(account._id) === -1) allAccountsChecked = false;
+			});
+
+			let toggleTo;
+
+			if (allAccountsChecked) toggleTo = false;
+			else toggleTo = true;
+
+			this.accounts.forEach(account => {
+				if (account.version === version) {
+					let selectedAccountIndex = this.selectedAccounts.indexOf(account._id);
+					if (toggleTo && selectedAccountIndex === -1) this.selectedAccounts.push(account._id);
+					if (!toggleTo && selectedAccountIndex !== -1) this.selectedAccounts.splice(selectedAccountIndex, 1);
+				}
+			});
 		}
 	},
 	mounted() {
@@ -112,6 +136,10 @@ export default {
 			socket.emit("account.getAll", res => {
 				console.log(res);
 				this.accounts = res.accounts;
+			});
+
+			socket.emit("accountSchema.getAllVersions", res => {
+				this.versions = res.versions;
 			});
 		});
 	}

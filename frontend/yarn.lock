@@ -1065,6 +1065,13 @@ concat-stream@^1.5.0:
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
 
+config@^3.2.2:
+  version "3.2.4"
+  resolved "https://registry.yarnpkg.com/config/-/config-3.2.4.tgz#e60a908582991e800852f9cb60fcf424f3274a6c"
+  integrity sha512-H1XIGfnU1EAkfjSLn9ZvYDRx9lOezDViuzLDgiJ/lMeqjYe3q6iQfpcLt2NInckJgpAeekbNhQkmnnbdEDs9rw==
+  dependencies:
+    json5 "^1.0.1"
+
 connect-history-api-fallback@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/connect-history-api-fallback/-/connect-history-api-fallback-1.6.0.tgz#8b32089359308d111115d81cad3fceab888f97bc"
