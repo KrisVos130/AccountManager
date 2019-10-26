@@ -1,6 +1,8 @@
 'use strict';
 
 const async = require("async");
+const fs = require("fs");
+const path = require("path");
 
 const coreClass = require("../core");
 
@@ -21,6 +23,8 @@ module.exports = class extends coreClass {
 
 			this.accountSchemaSchema = await this.mongoModule.schema("accountSchema");
 			this.accountSchemaModel = await this.mongoModule.model("accountSchema");
+
+			this.schemaDirectoryPath = path.join(__dirname, "..", "schemas", "account");
 
 			resolve();
 		})
@@ -90,6 +94,18 @@ module.exports = class extends coreClass {
 				if (err || !schema) reject(new Error("Something went wrong."))
 				else resolve(schema)
 			});
+		});
+	}
+
+	async listSchemasInDirectory() {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			fs.readdir(this.schemaDirectoryPath, (err, files) => {
+				if (err) reject(new Error(err.message))
+				else resolve(files.map(file => file.substring(0, file.length - 3)));
+			});
+				
 		});
 	}
 

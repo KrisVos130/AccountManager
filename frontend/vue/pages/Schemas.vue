@@ -3,7 +3,9 @@
 		<h1>Schemas</h1>
 		<hr/>
 		<br/>
-		<input v-model="importAccountSchemaName"/>
+		<select v-model="importAccountSchemaName">
+			<option v-for="schema in schemasInDirectory" :value="schema">{{ schema }}</option>
+		</select>
 		<button @click="importAccountSchema()" class="button">Import account schema</button>
 		<br/>
 		<br/>
@@ -34,6 +36,7 @@ export default {
 	data: () => {
 		return {
 			importAccountSchemaName: "",
+			schemasInDirectory: [],
 			schemas: [],
 			fields: [
 				{
@@ -82,6 +85,10 @@ export default {
 
 			this.socket.emit("accountSchema.getAll", res => {
 				this.schemas = res.schemas;
+			});
+
+			socket.emit("accountSchema.listSchemasInDirectory", res => {
+				this.schemasInDirectory = res.schemasInDirectory;
 			});
 		});
 	}

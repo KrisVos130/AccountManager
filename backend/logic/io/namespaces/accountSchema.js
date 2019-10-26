@@ -81,6 +81,20 @@ module.exports = {
 		});
 	},
 
+	"listSchemasInDirectory": (cb) => {
+		accountSchemaModule.listSchemasInDirectory().then((schemasInDirectory) => {
+			cb({
+				status: "success",
+				schemasInDirectory
+			});
+		}).catch(err => {
+			cb({
+				status: "failure",
+				error: err.message
+			});
+		});
+	},
+
 	"import": (cb, name) => {
 		accountSchemaModule.import(name).then(() => {
 			cb({

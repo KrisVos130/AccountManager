@@ -31,7 +31,9 @@
 		<h1>Convert schemas</h1>
 		<hr/>
 		<br/>
-		<input v-model="importConvertSchemaName"/>
+		<select v-model="importConvertSchemaName">
+			<option v-for="schema in schemasInDirectory" :value="schema">{{ schema }}</option>
+		</select>
 		<button @click="importConvertSchema()" class="button">Import convert schema</button>
 		<br/>
 		<br/>
@@ -65,6 +67,7 @@ export default {
 			convertSchemas: [],
 			versions: [],
 			selectedAccounts: [],
+			schemasInDirectory: [],
 			convertingAccounts: false,
 			accountsFields: [
 				{
@@ -196,6 +199,10 @@ export default {
 
 			socket.emit("convertSchema.getAll", res => {
 				this.convertSchemas = res.schemas;
+			});
+
+			socket.emit("convertSchema.listSchemasInDirectory", res => {
+				this.schemasInDirectory = res.schemasInDirectory;
 			});
 		});
 	}

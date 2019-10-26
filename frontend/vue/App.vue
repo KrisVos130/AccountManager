@@ -71,7 +71,7 @@ main {
 	}
 }
 
-input {
+input, select {
 	padding: 8px 12px;
 }
 </style>

@@ -1,6 +1,8 @@
 'use strict';
 
 const async = require("async");
+const fs = require("fs");
+const path = require("path");
 
 const coreClass = require("../core");
 
@@ -21,6 +23,8 @@ module.exports = class extends coreClass {
 
 			this.convertSchemaSchema = await this.mongoModule.schema("convertSchema");
 			this.convertSchemaModel = await this.mongoModule.model("convertSchema");
+
+			this.schemaDirectoryPath = path.join(__dirname, "..", "schemas", "convert");
 
 			resolve();
 		})
@@ -69,6 +73,18 @@ module.exports = class extends coreClass {
 				if (err) reject(new Error(err.message));
 				else resolve(schemas)
 			});
+		});
+	}
+
+	async listSchemasInDirectory() {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			fs.readdir(this.schemaDirectoryPath, (err, files) => {
+				if (err) reject(new Error(err.message))
+				else resolve(files.map(file => file.substring(0, file.length - 3)));
+			});
+				
 		});
 	}
 
