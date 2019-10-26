@@ -3,14 +3,7 @@
 		<h1>View schema</h1>
 		<hr/>
 		<br/>
-		<p><b>Version from</b>: {{ schema.versionFrom }}</p>
-		<p><b>Version to</b>: {{ schema.versionTo }}</p>
-		<p><b>Changes</b>: </p>
-		<div class="changes-container">
-			<div v-for="(key, value) in schema.changes" class="change-item">
-				<p><b>{{ key }}</b>: {{ value }}</p>
-			</div>
-		</div>
+		<object-viewer :object="schema"/>		
 		<br/>
 		<br/>
 		<button class="button" @click="removeSchema()">Remove schema</button>
@@ -18,10 +11,12 @@
 </template>
 
 <script>
+import ObjectViewer from '../components/ObjectViewer.vue';
+
 import io from "../../io.js";
 
 export default {
-	components: {},
+	components: { ObjectViewer },
 	data: () => {
 		return {
 			schema: null
@@ -45,9 +40,6 @@ export default {
 			this.socket.emit("convertSchema.getById", this.schemaId, res => {
 				if (res.status === "success") {
 					this.schema = res.schema;
-					this.schema.changes = {
-						Test123: "test1232321"
-					}
 				}
 			});
 		});
