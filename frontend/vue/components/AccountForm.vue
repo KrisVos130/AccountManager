@@ -52,12 +52,12 @@ export default {
 			let dependencyFieldId = dependency.fieldId;
 			if (!this.dependencyChecksOut(dependencyFieldId)) return false;
 			let dependencyEval = dependency.eval.replace("{fields}", "this.account.fields");
-			/*try {
+			try {
 				return eval(dependencyEval);
 			} catch(err) {
 				console.log("Eval error", err);
 				return false;
-			}*/
+			}
 			return false;
 		},
 		onFieldChange(fieldId) {
