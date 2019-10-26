@@ -97,7 +97,7 @@ module.exports = class extends coreClass {
 		return new Promise(async (resolve, reject) => {
 			try { await this._validateHook(); } catch { return; }
 
-			let schema = require(`../schemas/${name}`);
+			let schema = require(`../schemas/account/${name}`);
 			this.accountSchemaModel.create(schema, (err) => {
 				if (err) reject(new Error(err.message))
 				else resolve();
