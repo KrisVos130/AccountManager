@@ -3,7 +3,7 @@
 		<h1>Add account</h1>
 		<hr/>
 		<br/>
-		<account-form :onSubmit="onSubmit"/>
+		<account-form v-if="account.version" :onSubmit="onSubmit" :initialAccount="account"/>
 	</main>
 </template>
 
@@ -16,7 +16,7 @@ export default {
 	components: { AccountForm },
 	data: () => {
 		return {
-			
+			account: {}
 		}
 	},
 	methods: {
@@ -32,6 +32,12 @@ export default {
 	mounted() {
 		io.getSocket(socket => {
 			this.socket = socket;
+
+			this.socket.emit("accountSchema.getLatest", res => {
+				this.socket.emit("account.createEmptyAccount", res.schema.version, res => {
+					this.account = res.account;
+				});
+			});
 		});
 	}
 };

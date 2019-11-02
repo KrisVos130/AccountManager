@@ -29,6 +29,36 @@ module.exports = class extends coreClass {
 		})
 	}
 
+	async createEmptyAccount(version) {
+		return new Promise(async (resolve, reject) => {
+			try { await this._validateHook(); } catch { return; }
+
+			let schema = await this.accountSchemaModule.getByVersion(version).catch(reject);
+			if (!schema) return reject(new Error("No schema found."));
+
+			let account = {};
+
+			account.fields = {};
+			account.version = version;
+
+			schema.fields.forEach(field => {
+				let defaultObject = {};
+				field.fieldTypes.forEach(fieldType => {
+					if (fieldType.type === "text" || fieldType.type === "select") defaultObject[fieldType.fieldTypeId] = "";
+					else if (fieldType.type === "checkbox") defaultObject[fieldType.fieldTypeId] = false;
+				});
+				
+				account.fields[field.fieldId] = [];
+
+				for(let i = 0; i < field.minEntries; i++) {
+					account.fields[field.fieldId].push(defaultObject);
+				}
+			});
+
+			resolve(account);
+		});
+	}
+
 	async getAll() {
 		return new Promise(async (resolve, reject) => {
 			try { await this._validateHook(); } catch { return; }

@@ -5,6 +5,19 @@ const mongoModule = moduleManager.modules["mongo"];
 const utilModule = moduleManager.modules["util"];
 
 module.exports = {
+	"createEmptyAccount": async (cb, version) => {
+		accountModule.createEmptyAccount(version).then(account => {
+			cb({
+				status: "success",
+				account
+			});
+		}).catch(err => {
+			cb({
+				status: "failure"
+			});
+		});
+	},
+
 	"getAll": async cb => {
 		accountModule.getAll().then(accounts => {
 			cb({

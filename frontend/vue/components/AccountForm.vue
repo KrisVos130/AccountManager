@@ -64,31 +64,6 @@ export default {
 			return () => {
 				this.$set(this.account.fields, fieldId, this.$refs[fieldId][0].entries);
 			};
-		},
-		initializeAccount() {
-			if (!this.initialAccount) {
-				this.$set(this.account, "fields", {});
-				this.$set(this.account, "version", this.schema.version);
-
-				this.fields.forEach(field => {
-					let defaultObject = {};
-					field.fieldTypes.forEach(fieldType => {
-						if (fieldType.type === "text" || fieldType.type === "select") defaultObject[fieldType.fieldTypeId] = "";
-						else if (fieldType.type === "checkbox") defaultObject[fieldType.fieldTypeId] = false;
-					});
-					
-					this.$set(this.account.fields, field.fieldId, []);
-
-					for(let i = 0; i < field.minEntries; i++) {
-						this.account.fields[field.fieldId].push(defaultObject);
-					}
-				});
-
-				this.templateAccount = this.account;
-			} else {
-				this.account = this.initialAccount;
-				this.templateAccount = this.initialAccount;
-			}
 		}
 	},
 	props: {
@@ -100,21 +75,13 @@ export default {
 		io.getSocket(socket => {
 			this.socket = socket;
 
-			if (this.initialAccount) {
-				socket.emit("accountSchema.getByVersion", this.initialAccount.version, res => {
-					this.fields = res.schema.fields;
-					this.dependencies = (res.schema.dependencies) ? res.schema.dependencies : {};
-					this.initializeAccount();
-				});
-			} else {
-				socket.emit("accountSchema.getLatest", res => {
-					this.fields = res.schema.fields;
-					this.schema = res.schema;
-					this.dependencies = (res.schema.dependencies) ? res.schema.dependencies : {};
-					this.initializeAccount();
-				});
-			}
-
+			socket.emit("accountSchema.getByVersion", this.initialAccount.version, res => {
+				this.fields = res.schema.fields;
+				this.dependencies = (res.schema.dependencies) ? res.schema.dependencies : {};
+				this.account = this.initialAccount;
+				this.templateAccount = this.initialAccount;
+			});
+			
 			socket.emit("util.getAutosuggest", res => {
 				this.autosuggest = res.autosuggest;
 			});
